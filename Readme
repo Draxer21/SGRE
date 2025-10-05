@@ -1,0 +1,21 @@
+# Sistema de Gestión Administrativa Municipal
+
+Proyecto de Integración - Ingeniería en Informática (INACAP)
+
+## Descripción
+Sistema web modular basado en arquitectura 3-tier que integra módulos de Recursos Humanos, Finanzas y Adquisiciones, conforme a los procesos estandarizados por SUBDERE (2024).  
+El sistema busca optimizar la gestión municipal a través de automatización de flujos BPMN, registro de datos estructurados y reportes administrativos.
+
+## Tecnologías
+- Frontend: React.js, TailwindCSS
+- Backend: Django REST Framework (Python 3.11)
+- Base de Datos: PostgreSQL 15
+- BPMN Engine: Django + lógica de flujos secuenciales
+
+## Estructura
+- `/backend`: código servidor (API REST, lógica de negocio)
+- `/frontend`: interfaz de usuario
+- `/docs`: diagramas y documentación de análisis y diseño
+
+## Licencia
+Proyecto educativo - Uso académico.
