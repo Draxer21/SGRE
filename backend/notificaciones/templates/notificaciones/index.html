@@ -2,82 +2,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Notificaciones | Panel</title>
-    <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notificaciones | Inicio</title>
+  <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
 </head>
-<body>   {% include 'includes/layout_open.html' %}
-    <div class="app-shell">
-        <header class="app-header">
-            <div>
-                <h1 class="app-title">Centro de Notificaciones</h1>
-                <p class="app-subtitle">Coordina alertas automáticas y seguimiento de incidentes.</p>
-            </div>
-            <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'notificaciones:nueva' %}">Nueva notificación</a>
-                <a class="btn btn--ghost" href="{% url 'notificaciones:historial' %}">Ver historial</a>
-            </div>
-        </header>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">Centro de Notificaciones</h1>
+        <p class="app-subtitle">Configura alertas automáticas y seguimiento.</p>
+      </div>
+      <div class="grid" style="gap:12px; grid-auto-flow:column;">
+        <a class="btn btn--primary" href="{% url 'notificaciones:nueva' %}">Nueva notificación</a>
+        <a class="btn btn--ghost" href="{% url 'notificaciones:historial' %}">Historial</a>
+      </div>
+    </header>
 
-        <main class="grid grid--two-columns">
-            <section class="surface">
-                <h2 class="section-title">Alertas recientes</h2>
-                <div class="grid">
-                    {% for alerta in alertas %}
-                        <article class="card">
-                            <div class="card__header">
-                                <h3 class="card__title">{{ alerta.titulo }}</h3>
-                                <span class="badge">{{ alerta.estado }}</span>
-                            </div>
-                            <p class="card__meta">{{ alerta.descripcion }}</p>
-                            <p class="card__meta">{{ alerta.fecha|date:"d/m/Y H:i" }}</p>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">
-                            No se registran alertas recientes.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <section class="surface">
-                <h2 class="section-title">Canales disponibles</h2>
-                <div class="channel-list">
-                    {% for canal in canales %}
-                        <span class="channel-chip">{{ canal.nombre }} — {{ canal.estado }}</span>
-                    {% empty %}
-                        <div class="empty-state">
-                            Sin canales configurados.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <section class="surface">
-                <h2 class="section-title">Línea de seguimiento</h2>
-                <ul class="timeline">
-                    {% for evento in timeline %}
-                        <li class="timeline-item">
-                            <span class="timeline-dot"></span>
-                            <h3 class="card__title" style="margin:0 0 6px;">{{ evento.titulo }}</h3>
-                            <p class="card__meta">{{ evento.descripcion }}</p>
-                            <p class="card__meta">{{ evento.fecha|date:"d/m/Y H:i" }} • {{ evento.responsable }}</p>
-                        </li>
-                    {% empty %}
-                        <li>
-                            <div class="empty-state">
-                                Aún no hay eventos registrados.
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </main>
-    </div>
-  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+    <main class="grid grid--two-columns">
+      <section class="surface">
+        <h2 class="section-title">Estado de canales</h2>
+        <div class="grid">
+          <article class="card"><div class="card__header"><h3 class="card__title">Correo</h3></div><p class="card__meta">Operativo</p></article>
+          <article class="card"><div class="card__header"><h3 class="card__title">Push</h3></div><p class="card__meta">Operativo</p></article>
+          <article class="card"><div class="card__header"><h3 class="card__title">SMS</h3></div><p class="card__meta">En revisión</p></article>
+        </div>
+      </section>
+      <section class="surface">
+        <h2 class="section-title">Enlaces</h2>
+        <div class="grid">
+          <a class="link" href="/reportes/">Ver reportes</a>
+          <a class="link" href="/admin/">Administración</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  {% include 'includes/footer.html' %}
+  {% include 'includes/layout_close.html' %}
 </body>
 </html>
-
-
-

@@ -2,72 +2,52 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cuentas | Panel</title>
-    <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cuentas | Inicio</title>
+  <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
 </head>
-<body>    {% include 'includes/layout_open.html' %}
-    <div class="app-shell">
-        <header class="app-header">
-            <div>
-                <h1 class="app-title">Administración de Cuentas</h1>
-                <p class="app-subtitle">Gestiona perfiles, accesos y sesiones activas.</p>
-            </div>
-            <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'cuentas:cuenta_create' %}">Crear usuario</a>
-                <a class="btn btn--ghost" href="{% url 'cuentas:login' %}">Cerrar sesión</a>
-            </div>
-        </header>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">Centro de Cuentas</h1>
+        <p class="app-subtitle">Administra usuarios, roles y accesos.</p>
+      </div>
+      <div class="grid" style="gap:12px; grid-auto-flow:column;">
+        <a class="btn btn--primary" href="{% url 'cuentas:cuenta_create' %}">Nueva cuenta</a>
+        <a class="btn btn--ghost" href="{% url 'cuentas:cuenta_list' %}">Gestionar</a>
+        <a class="btn btn--ghost" href="{% url 'cuentas:login' %}">Iniciar sesión</a>
+      </div>
+    </header>
 
-        <main class="grid grid--two-columns">
-            <section class="surface">
-                <h2 class="section-title">Usuarios registrados</h2>
-                <div class="user-list">
-                    {% for usuario in usuarios %}
-                        <article class="user-row">
-                            <div class="avatar">{{ usuario.iniciales }}</div>
-                            <div>
-                                <p class="card__title" style="margin:0;">{{ usuario.nombre }}</p>
-                                <p class="card__meta">{{ usuario.rol }}</p>
-                                <p class="card__meta">Último acceso {{ usuario.ultimo_acceso|date:"d/m/Y H:i" }}</p>
-                            </div>
-                            <a class="link" href="{% url 'cuentas:cuenta_list' %}">Ver perfil</a>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">
-                            No se encontraron usuarios registrados.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
+    <main class="grid grid--two-columns">
+      <section class="surface">
+        <h2 class="section-title">Resumen</h2>
+        <div class="grid grid--two-columns">
+          <article class="card">
+            <div class="card__header"><h3 class="card__title">Usuarios activos</h3></div>
+            <p class="card__meta">Cuentas habilitadas para acceso.</p>
+          </article>
+          <article class="card">
+            <div class="card__header"><h3 class="card__title">Roles configurados</h3></div>
+            <p class="card__meta">Administrador, Editor y Consulta.</p>
+          </article>
+        </div>
+      </section>
 
-            <section class="surface">
-                <h2 class="section-title">Actividad reciente</h2>
-                <div class="grid">
-                    {% for acceso in accesos %}
-                        <article class="card">
-                            <div class="card__header">
-                                <h3 class="card__title">{{ acceso.usuario }}</h3>
-                                <span class="card__meta">{{ acceso.fecha|date:"d/m/Y H:i" }}</span>
-                            </div>
-                            <p class="card__meta">{{ acceso.descripcion }}</p>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">
-                            Sin actividad registrada.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-        </main>
-    </div>
-  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+      <section class="surface">
+        <h2 class="section-title">Accesos rápidos</h2>
+        <div class="grid">
+          <a class="link" href="{% url 'cuentas:cuenta_list' %}">Ver listado de cuentas</a>
+          <a class="link" href="{% url 'cuentas:cuenta_create' %}">Crear nueva cuenta</a>
+          <a class="link" href="/admin/">Ir a Administración</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  {% include 'includes/footer.html' %}
+  {% include 'includes/layout_close.html' %}
 </body>
 </html>
-
-
-
-
-
-

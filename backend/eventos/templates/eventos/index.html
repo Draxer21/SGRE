@@ -2,92 +2,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Eventos | Planificación</title>
-    <link rel="stylesheet" href="{% static 'css/eventos.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eventos | Inicio</title>
+  <link rel="stylesheet" href="{% static 'css/eventos.css' %}">
 </head>
-<body>    {% include 'includes/layout_open.html' %}
-    <div class="app-shell">
-        <header class="app-header">
-            <div>
-                <h1 class="app-title">Gestión de Eventos</h1>
-                <p class="app-subtitle">Coordina actividades, recursos y cronogramas institucionales.</p>
-            </div>
-            <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'eventos:evento_create' %}">Nuevo evento</a>
-                <a class="btn btn--outline" href="{% url 'eventos:evento_list' %}">Bases y plantillas</a>
-            </div>
-        </header>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">Gestión de Eventos</h1>
+        <p class="app-subtitle">Planifica actividades y coordina recursos.</p>
+      </div>
+      <div class="grid" style="gap:12px; grid-auto-flow:column;">
+        <a class="btn btn--primary" href="{% url 'eventos:evento_create' %}">Nuevo evento</a>
+        <a class="btn btn--ghost" href="{% url 'eventos:evento_list' %}">Gestionar</a>
+      </div>
+    </header>
 
-        <main class="grid grid--two-columns">
-            <section class="surface">
-                <h2 class="section-title">Agenda próxima</h2>
-                <div class="grid">
-                    {% for evento in agenda %}
-                        <article class="card">
-                            <div class="card__header">
-                                <h3 class="card__title">{{ evento.titulo }}</h3>
-                                <span class="badge">{{ evento.estado }}</span>
-                            </div>
-                            <p class="card__meta">{{ evento.fecha|date:"d/m/Y" }} • {{ evento.hora|time:"H:i" }}</p>
-                            <p class="card__meta">{{ evento.lugar }}</p>
-                            <a class="link" href="{% url 'eventos:evento_list' %}">Ver detalle</a>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">
-                            No hay eventos programados. Crea uno nuevo para comenzar.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <section class="surface">
-                <h2 class="section-title">Hitos recientes</h2>
-                <ul class="timeline">
-                    {% for hito in hitos %}
-                        <li class="timeline-item">
-                            <span class="timeline-dot"></span>
-                            <h3 class="card__title" style="margin:0 0 6px;">{{ hito.titulo }}</h3>
-                            <p class="card__meta">{{ hito.descripcion }}</p>
-                            <p class="card__meta">{{ hito.fecha|date:"d/m/Y H:i" }} • {{ hito.responsable }}</p>
-                        </li>
-                    {% empty %}
-                        <li>
-                            <div class="empty-state">
-                                Sin hitos registrados.
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-
-            <section class="surface">
-                <h2 class="section-title">Recursos asignados</h2>
-                <div class="grid">
-                    {% for recurso in recursos %}
-                        <article class="card">
-                            <div class="card__header">
-                                <h3 class="card__title">{{ recurso.nombre }}</h3>
-                                <span class="badge">{{ recurso.estado }}</span>
-                            </div>
-                            <p class="card__meta">{% if recurso.evento %}Asignado a {{ recurso.evento }}{% else %}Disponible{% endif %}</p>
-                        </article>
-                    {% empty %}
-                        <div class="empty-state">
-                            Sin recursos asociados.
-                        </div>
-                    {% endfor %}
-                </div>
-            </section>
-        </main>
-    </div>
-  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+    <main class="grid grid--two-columns">
+      <section class="surface">
+        <h2 class="section-title">Próximo paso</h2>
+        <article class="card">
+          <div class="card__header"><h3 class="card__title">Crea tu primer evento</h3></div>
+          <p class="card__meta">Define título, fecha, hora, lugar y estado.</p>
+          <a class="link" href="{% url 'eventos:evento_create' %}">Comenzar ahora</a>
+        </article>
+      </section>
+      <section class="surface">
+        <h2 class="section-title">Accesos rápidos</h2>
+        <div class="grid">
+          <a class="link" href="{% url 'eventos:evento_list' %}">Ver todos los eventos</a>
+          <a class="link" href="/reportes/">Ir a Reportes</a>
+        </div>
+      </section>
+    </main>
+  </div>
+  {% include 'includes/footer.html' %}
+  {% include 'includes/layout_close.html' %}
 </body>
 </html>
-
-
-
-
-
-
