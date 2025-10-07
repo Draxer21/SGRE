@@ -1,40 +1,49 @@
-﻿from datetime import date
-
-from django.http import HttpResponse
+﻿from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+
+from .forms import ReporteForm
+from .models import Reporte
 
 
 def panel(request):
-    indicadores = [
-        {"nombre": "Asistencia promedio", "valor": "82%", "tendencia": "+5% respecto al mes anterior"},
-        {"nombre": "Eventos realizados", "valor": "18", "tendencia": "+2"},
-        {"nombre": "Reservas confirmadas", "valor": "146", "tendencia": "+9%"},
-        {"nombre": "Avisos enviados", "valor": "320", "tendencia": "-3%"},
-    ]
-
-    reportes = [
-        {"titulo": "Reporte mensual de eventos", "descripcion": "Detalle de asistencia, costos y feedback.", "fecha": date(2025, 6, 1)},
-        {"titulo": "Ocupación de espacios", "descripcion": "Uso de salas y anfiteatros por semana.", "fecha": date(2025, 6, 3)},
-        {"titulo": "Alertas críticas", "descripcion": "Incidencias y tiempos de respuesta.", "fecha": date(2025, 6, 5)},
-    ]
-
-    series = [
-        {"nombre": "Reservas confirmadas", "valor": "146", "variacion": "+12"},
-        {"nombre": "Cancelaciones", "valor": "18", "variacion": "-3"},
-        {"nombre": "Recordatorios enviados", "valor": "280", "variacion": "+20"},
-    ]
-
-    context = {
-        "indicadores": indicadores,
-        "reportes": reportes,
-        "series": series,
-    }
-    return render(request, "reportes/index.html", context)
+    indicadores = []
+    reportes = []
+    series = []
+    return render(request, "reportes/index.html", {"indicadores": indicadores, "reportes": reportes, "series": series})
 
 
-def generar(request):
-    return HttpResponse("Generación de reportes personalizados en construcción.")
+# -------- CRUD Reportes --------
+class ReporteList(ListView):
+    model = Reporte
+    template_name = "reportes/reporte_list.html"
+    context_object_name = "reportes"
 
 
-def exportar(request):
-    return HttpResponse("Exportación a formatos externos disponible próximamente.")
+class ReporteDetail(DetailView):
+    model = Reporte
+    template_name = "reportes/reporte_detail.html"
+
+
+class ReporteCreate(CreateView):
+    model = Reporte
+    form_class = ReporteForm
+    template_name = "reportes/reporte_form.html"
+    success_url = reverse_lazy("reportes:reporte_list")
+
+
+class ReporteUpdate(UpdateView):
+    model = Reporte
+    form_class = ReporteForm
+    template_name = "reportes/reporte_form.html"
+    success_url = reverse_lazy("reportes:reporte_list")
+
+
+class ReporteDelete(DeleteView):
+    model = Reporte
+    template_name = "reportes/reporte_confirm_delete.html"
+    success_url = reverse_lazy("reportes:reporte_list")
+
+
+# -------- Fin CRUD --------

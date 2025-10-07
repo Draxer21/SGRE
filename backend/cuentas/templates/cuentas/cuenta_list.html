@@ -1,0 +1,26 @@
+﻿{% load static %}
+{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h2 class="section-title" style="margin:0;">Cuentas</h2>
+    <a class="btn btn--primary" href="{% url 'cuentas:cuenta_create' %}">Nueva cuenta</a>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    {% for c in cuentas %}
+      <article class="card">
+        <div class="card__header">
+          <h3 class="card__title">{{ c.nombre }}</h3>
+          <span class="badge">{{ c.get_rol_display }}</span>
+        </div>
+        <p class="card__meta">{{ c.email }}</p>
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <a class="link" href="{% url 'cuentas:cuenta_detail' c.pk %}">Ver</a>
+          <a class="link" href="{% url 'cuentas:cuenta_update' c.pk %}">Editar</a>
+          <a class="link" href="{% url 'cuentas:cuenta_delete' c.pk %}">Eliminar</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">Aún no hay cuentas registradas.</div>
+    {% endfor %}
+  </div>
+</div>

@@ -1,0 +1,11 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px; max-width:680px;">
+  <h2 class="section-title">{{ object.nombre }}</h2>
+  <p class="card__meta">Correo: {{ object.email }}</p>
+  <p class="card__meta">Rol: {{ object.get_rol_display }}</p>
+  <p class="card__meta">Activo: {{ object.activo|yesno:"Sí,No" }}</p>
+  <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px; margin-top:12px;">
+    <a class="btn btn--ghost" href="{% url 'cuentas:cuenta_update' object.pk %}">Editar</a>
+    <a class="btn btn--ghost" href="{% url 'cuentas:cuenta_list' %}">Volver</a>
+  </div>
+</div>

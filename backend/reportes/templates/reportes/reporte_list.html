@@ -1,0 +1,25 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h2 class="section-title" style="margin:0;">Reportes</h2>
+    <a class="btn btn--primary" href="{% url 'reportes:reporte_create' %}">Nuevo reporte</a>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    {% for r in reportes %}
+      <article class="card">
+        <div class="card__header">
+          <h3 class="card__title">{{ r.titulo }}</h3>
+          <span class="badge">{% if r.publicado %}Publicado{% else %}Borrador{% endif %}</span>
+        </div>
+        <p class="card__meta">{{ r.fecha|date:'d/m/Y' }}</p>
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <a class="link" href="{% url 'reportes:reporte_detail' r.pk %}">Ver</a>
+          <a class="link" href="{% url 'reportes:reporte_update' r.pk %}">Editar</a>
+          <a class="link" href="{% url 'reportes:reporte_delete' r.pk %}">Eliminar</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">Aún no hay reportes.</div>
+    {% endfor %}
+  </div>
+</div>

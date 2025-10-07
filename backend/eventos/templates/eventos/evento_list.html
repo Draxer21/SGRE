@@ -1,0 +1,25 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h2 class="section-title" style="margin:0;">Eventos</h2>
+    <a class="btn btn--primary" href="{% url 'eventos:evento_create' %}">Nuevo evento</a>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    {% for e in eventos %}
+      <article class="card">
+        <div class="card__header">
+          <h3 class="card__title">{{ e.titulo }}</h3>
+          <span class="badge">{{ e.get_estado_display }}</span>
+        </div>
+        <p class="card__meta">{{ e.fecha|date:'d/m/Y' }} • {{ e.hora|time:'H:i' }} • {{ e.lugar }}</p>
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <a class="link" href="{% url 'eventos:evento_detail' e.pk %}">Ver</a>
+          <a class="link" href="{% url 'eventos:evento_update' e.pk %}">Editar</a>
+          <a class="link" href="{% url 'eventos:evento_delete' e.pk %}">Eliminar</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">Aún no hay eventos registrados.</div>
+    {% endfor %}
+  </div>
+</div>

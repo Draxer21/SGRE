@@ -1,0 +1,11 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px; max-width:720px;">
+  <h2 class="section-title">{{ object.titulo }}</h2>
+  <p class="card__meta">{{ object.fecha|date:'d/m/Y' }} • {{ object.hora|time:'H:i' }} • {{ object.lugar }}</p>
+  <p class="card__meta">Estado: {{ object.get_estado_display }}</p>
+  <p class="card__meta">{{ object.descripcion }}</p>
+  <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px; margin-top:12px;">
+    <a class="btn btn--ghost" href="{% url 'eventos:evento_update' object.pk %}">Editar</a>
+    <a class="btn btn--ghost" href="{% url 'eventos:evento_list' %}">Volver</a>
+  </div>
+</div>

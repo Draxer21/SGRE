@@ -1,0 +1,13 @@
+﻿{% load static %}
+{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px; max-width:680px;">
+  <h2 class="section-title">{{ view.object|default:'Nueva cuenta' }}</h2>
+  <form method="post" class="grid" style="gap:14px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+      <button class="btn btn--primary" type="submit">Guardar</button>
+      <a class="btn btn--ghost" href="{% url 'cuentas:cuenta_list' %}">Cancelar</a>
+    </div>
+  </form>
+</div>

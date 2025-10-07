@@ -2,6 +2,11 @@
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+
+from .forms import EventoForm
+from .models import Evento
 
 
 def panel(request):
@@ -51,13 +56,36 @@ def panel(request):
     return render(request, "eventos/index.html", context)
 
 
-def crear(request):
-    return HttpResponse("Formulario de creación de evento en construcción.")
+# -------- CRUD Eventos --------
+class EventoList(ListView):
+    model = Evento
+    template_name = "eventos/evento_list.html"
+    context_object_name = "eventos"
 
 
-def bases(request):
-    return HttpResponse("Gestión de bases y plantillas de evento disponible próximamente.")
+class EventoDetail(DetailView):
+    model = Evento
+    template_name = "eventos/evento_detail.html"
 
 
-def detalle(request, evento_id):
-    return HttpResponse(f"Detalle del evento {evento_id} en construcción.")
+class EventoCreate(CreateView):
+    model = Evento
+    form_class = EventoForm
+    template_name = "eventos/evento_form.html"
+    success_url = reverse_lazy("eventos:evento_list")
+
+
+class EventoUpdate(UpdateView):
+    model = Evento
+    form_class = EventoForm
+    template_name = "eventos/evento_form.html"
+    success_url = reverse_lazy("eventos:evento_list")
+
+
+class EventoDelete(DeleteView):
+    model = Evento
+    template_name = "eventos/evento_confirm_delete.html"
+    success_url = reverse_lazy("eventos:evento_list")
+
+
+# -------- Fin CRUD --------

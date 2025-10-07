@@ -3,9 +3,11 @@
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
-from .forms import LoginForm
+from .forms import CuentaForm, LoginForm
+from .models import Cuenta
 
 
 def login_view(request):
@@ -59,9 +61,36 @@ def panel(request):
     return render(request, "cuentas/index.html", context)
 
 
-def nuevo(request):
-    return HttpResponse("Alta de usuario en construcción.")
+# -------- CRUD Cuentas --------
+class CuentaList(ListView):
+    model = Cuenta
+    template_name = "cuentas/cuenta_list.html"
+    context_object_name = "cuentas"
 
 
-def detalle(request, usuario_id):
-    return HttpResponse(f"Detalle del usuario {usuario_id} en construcción.")
+class CuentaDetail(DetailView):
+    model = Cuenta
+    template_name = "cuentas/cuenta_detail.html"
+
+
+class CuentaCreate(CreateView):
+    model = Cuenta
+    form_class = CuentaForm
+    template_name = "cuentas/cuenta_form.html"
+    success_url = reverse_lazy("cuentas:cuenta_list")
+
+
+class CuentaUpdate(UpdateView):
+    model = Cuenta
+    form_class = CuentaForm
+    template_name = "cuentas/cuenta_form.html"
+    success_url = reverse_lazy("cuentas:cuenta_list")
+
+
+class CuentaDelete(DeleteView):
+    model = Cuenta
+    template_name = "cuentas/cuenta_confirm_delete.html"
+    success_url = reverse_lazy("cuentas:cuenta_list")
+
+
+# -------- Fin CRUD Cuentas --------

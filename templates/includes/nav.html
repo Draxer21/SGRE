@@ -1,0 +1,23 @@
+﻿{# Global nav for SGRE. Included at top of every page. #}
+<nav class="sgre-nav">
+  <div class="sgre-nav__container">
+    <a href="/" class="sgre-nav__brand">SGRE</a>
+    <div class="sgre-nav__links">
+      <a class="sgre-nav__link" href="{% url 'cuentas:panel' %}">Cuentas</a>
+      <a class="sgre-nav__link" href="{% url 'eventos:panel' %}">Eventos</a>
+      <a class="sgre-nav__link" href="{% url 'reservas:panel' %}">Reservas</a>
+      <a class="sgre-nav__link" href="{% url 'reportes:panel' %}">Reportes</a>
+      <a class="sgre-nav__link" href="{% url 'notificaciones:panel' %}">Notificaciones</a>
+      <a class="sgre-nav__link" href="/admin/">Admin</a>
+    </div>
+  </div>
+</nav>
+<style>
+  .sgre-nav { position: sticky; top: 0; z-index: 1000; background: #0f172a; color: #e5e7eb; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .sgre-nav__container { max-width: 1200px; margin: 0 auto; padding: 10px 16px; display:flex; align-items:center; justify-content:space-between; gap: 16px; }
+  .sgre-nav__brand { color: #38bdf8; font-weight: 700; text-decoration: none; letter-spacing: .2px; }
+  .sgre-nav__links { display:flex; gap: 12px; flex-wrap: wrap; }
+  .sgre-nav__link { color: #cbd5e1; text-decoration: none; padding: 6px 10px; border-radius: 6px; }
+  .sgre-nav__link:hover { background: rgba(148,163,184,.15); color: #fff; }
+  @media (max-width: 640px){ .sgre-nav__container{ padding:8px 12px } .sgre-nav__links{ gap:8px } }
+</style>

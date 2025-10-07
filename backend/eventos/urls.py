@@ -6,7 +6,11 @@ app_name = "eventos"
 
 urlpatterns = [
     path("", views.panel, name="panel"),
-    path("crear/", views.crear, name="crear"),
-    path("bases/", views.bases, name="bases"),
-    path("<int:evento_id>/", views.detalle, name="detalle"),
+
+    # CRUD
+    path("gestionar/", views.EventoList.as_view(), name="evento_list"),
+    path("gestionar/nuevo/", views.EventoCreate.as_view(), name="evento_create"),
+    path("gestionar/<int:pk>/", views.EventoDetail.as_view(), name="evento_detail"),
+    path("gestionar/<int:pk>/editar/", views.EventoUpdate.as_view(), name="evento_update"),
+    path("gestionar/<int:pk>/eliminar/", views.EventoDelete.as_view(), name="evento_delete"),
 ]

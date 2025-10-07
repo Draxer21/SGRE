@@ -1,0 +1,12 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px; max-width:700px;">
+  <h2 class="section-title">{{ view.object|default:'Nuevo evento' }}</h2>
+  <form method="post" class="grid" style="gap:14px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+      <button class="btn btn--primary" type="submit">Guardar</button>
+      <a class="btn btn--ghost" href="{% url 'eventos:evento_list' %}">Cancelar</a>
+    </div>
+  </form>
+</div>

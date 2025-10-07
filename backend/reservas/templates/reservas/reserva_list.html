@@ -1,0 +1,26 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+    <h2 class="section-title" style="margin:0;">Reservas</h2>
+    <a class="btn btn--primary" href="{% url 'reservas:reserva_create' %}">Nueva reserva</a>
+  </div>
+  <div class="grid" style="margin-top:16px;">
+    {% for r in reservas %}
+      <article class="card">
+        <div class="card__header">
+          <h3 class="card__title">{{ r.codigo }} — {{ r.espacio }}</h3>
+          <span class="badge">{{ r.get_estado_display }}</span>
+        </div>
+        <p class="card__meta">{{ r.fecha|date:'d/m/Y' }} • {{ r.hora|time:'H:i' }}</p>
+        <p class="card__meta">Solicitante: {{ r.solicitante }}</p>
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <a class="link" href="{% url 'reservas:reserva_detail' r.pk %}">Ver</a>
+          <a class="link" href="{% url 'reservas:reserva_update' r.pk %}">Editar</a>
+          <a class="link" href="{% url 'reservas:reserva_delete' r.pk %}">Eliminar</a>
+        </div>
+      </article>
+    {% empty %}
+      <div class="empty-state">Aún no hay reservas registradas.</div>
+    {% endfor %}
+  </div>
+</div>

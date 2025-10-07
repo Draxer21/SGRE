@@ -1,70 +1,52 @@
-﻿from datetime import date, time
+﻿from datetime import date
 
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+
+from .forms import ReservaForm
+from .models import Reserva
 
 
 def panel(request):
-    reservas_activas = [
-        {
-            "codigo": "RES-2045",
-            "espacio": "Auditorio Municipal",
-            "fecha": date(2025, 6, 12),
-            "hora": time(18, 0),
-            "solicitante": "Dirección de Cultura",
-            "ocupacion": 78,
-        },
-        {
-            "codigo": "RES-2046",
-            "espacio": "Sala de Reuniones Norte",
-            "fecha": date(2025, 6, 15),
-            "hora": time(9, 30),
-            "solicitante": "Departamento de Obras",
-            "ocupacion": 45,
-        },
-    ]
-
-    espacios_raw = [
-        {"nombre": "Auditorio Municipal", "capacidad": 250, "ocupados": 195},
-        {"nombre": "Sala de Prensa", "capacidad": 80, "ocupados": 22},
-        {"nombre": "Anfiteatro Parque Central", "capacidad": 420, "ocupados": 320},
-    ]
-
+    # Panel de ejemplo conservado
+    reservas_activas = []
     espacios = []
-    for item in espacios_raw:
-        capacidad = item["capacidad"] or 1
-        ocupados = item["ocupados"]
-        ocupacion = round((ocupados / capacidad) * 100)
-        espacios.append({
-            **item,
-            "disponibles": capacidad - ocupados,
-            "ocupacion": ocupacion,
-        })
-
-    espera = [
-        {
-            "solicitante": "Programa Jóvenes",
-            "espacio": "Auditorio Municipal",
-            "estado": "Pendiente de confirmación",
-        },
-        {
-            "solicitante": "Turismo",
-            "espacio": "Parque Central",
-            "estado": "Requiere aprobación",
-        },
-    ]
-
-    context = {
-        "reservas_activas": reservas_activas,
-        "espacios": espacios,
-        "espera": espera,
-    }
-    return render(request, "reservas/index.html", context)
+    espera = []
+    return render(request, "reservas/index.html", {"reservas_activas": reservas_activas, "espacios": espacios, "espera": espera})
 
 
-def crear(request):
-    return HttpResponse("Registro de reserva en construcción.")
+# -------- CRUD Reservas --------
+class ReservaList(ListView):
+    model = Reserva
+    template_name = "reservas/reserva_list.html"
+    context_object_name = "reservas"
 
 
-def cancelar(request, codigo):
-    return HttpResponse(f"Cancelación de la reserva {codigo} en construcción.")
+class ReservaDetail(DetailView):
+    model = Reserva
+    template_name = "reservas/reserva_detail.html"
+
+
+class ReservaCreate(CreateView):
+    model = Reserva
+    form_class = ReservaForm
+    template_name = "reservas/reserva_form.html"
+    success_url = reverse_lazy("reservas:reserva_list")
+
+
+class ReservaUpdate(UpdateView):
+    model = Reserva
+    form_class = ReservaForm
+    template_name = "reservas/reserva_form.html"
+    success_url = reverse_lazy("reservas:reserva_list")
+
+
+class ReservaDelete(DeleteView):
+    model = Reserva
+    template_name = "reservas/reserva_confirm_delete.html"
+    success_url = reverse_lazy("reservas:reserva_list")
+
+
+# -------- Fin CRUD --------

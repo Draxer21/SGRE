@@ -6,6 +6,11 @@ app_name = "reservas"
 
 urlpatterns = [
     path("", views.panel, name="panel"),
-    path("nueva/", views.crear, name="nueva"),
-    path("cancelar/<slug:codigo>/", views.cancelar, name="cancelar"),
+
+    # CRUD
+    path("gestionar/", views.ReservaList.as_view(), name="reserva_list"),
+    path("gestionar/nueva/", views.ReservaCreate.as_view(), name="reserva_create"),
+    path("gestionar/<slug:pk>/", views.ReservaDetail.as_view(), name="reserva_detail"),
+    path("gestionar/<slug:pk>/editar/", views.ReservaUpdate.as_view(), name="reserva_update"),
+    path("gestionar/<slug:pk>/eliminar/", views.ReservaDelete.as_view(), name="reserva_delete"),
 ]

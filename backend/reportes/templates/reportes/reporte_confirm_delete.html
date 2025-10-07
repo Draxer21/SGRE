@@ -1,0 +1,10 @@
+﻿{% include 'includes/nav.html' %}
+<div class="surface" style="margin:16px; max-width:680px;">
+  <h2 class="section-title">Eliminar reporte</h2>
+  <p class="card__meta">¿Eliminar definitivamente <strong>{{ object.titulo }}</strong> del {{ object.fecha|date:'d/m/Y' }}?</p>
+  <form method="post" style="margin-top:12px;">
+    {% csrf_token %}
+    <button class="btn btn--primary" type="submit">Sí, eliminar</button>
+    <a class="btn btn--ghost" href="{% url 'reportes:reporte_list' %}">Cancelar</a>
+  </form>
+</div>
