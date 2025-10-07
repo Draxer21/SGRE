@@ -1,4 +1,16 @@
-﻿{% include 'includes/nav.html' %}
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SGRE</title>
+  <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+
 <div class="surface" style="margin:16px;">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
     <h2 class="section-title" style="margin:0;">Reportes</h2>
@@ -13,7 +25,7 @@
         </div>
         <p class="card__meta">{{ r.fecha|date:'d/m/Y' }}</p>
         <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
-          <a class="link" href="{% url 'reportes:reporte_detail' r.pk %}">Ver</a>
+          <a class="link" href="{% url 'reportes:reporte_detail' r.pk %}">Ver detalle</a>
           <a class="link" href="{% url 'reportes:reporte_update' r.pk %}">Editar</a>
           <a class="link" href="{% url 'reportes:reporte_delete' r.pk %}">Eliminar</a>
         </div>
@@ -23,3 +35,11 @@
     {% endfor %}
   </div>
 </div>
+
+  </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+</body>
+</html>
+
+
+

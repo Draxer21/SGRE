@@ -234,3 +234,15 @@ body {
     align-items: flex-start;
   }
 }
+
+/* Footer theme variables */
+:root {
+  --footer-bg: ;
+  --footer-fg: ;
+  --footer-muted: ;
+  --footer-border: ;
+  --footer-link: ;
+  --footer-link-hover: ;
+  --footer-badge-bg: ;
+  --footer-badge-border: ;
+}

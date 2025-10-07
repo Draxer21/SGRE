@@ -7,7 +7,7 @@
     <title>Eventos | Planificación</title>
     <link rel="stylesheet" href="{% static 'css/eventos.css' %}">
 </head>
-<body>\n    {% include 'includes/nav.html' %}
+<body>    {% include 'includes/layout_open.html' %}
     <div class="app-shell">
         <header class="app-header">
             <div>
@@ -15,8 +15,8 @@
                 <p class="app-subtitle">Coordina actividades, recursos y cronogramas institucionales.</p>
             </div>
             <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'eventos:crear' %}">Nuevo evento</a>
-                <a class="btn btn--outline" href="{% url 'eventos:bases' %}">Bases y plantillas</a>
+                <a class="btn btn--primary" href="{% url 'eventos:evento_create' %}">Nuevo evento</a>
+                <a class="btn btn--outline" href="{% url 'eventos:evento_list' %}">Bases y plantillas</a>
             </div>
         </header>
 
@@ -32,7 +32,7 @@
                             </div>
                             <p class="card__meta">{{ evento.fecha|date:"d/m/Y" }} • {{ evento.hora|time:"H:i" }}</p>
                             <p class="card__meta">{{ evento.lugar }}</p>
-                            <a class="link" href="{% url 'eventos:detalle' forloop.counter %}">Ver detalle</a>
+                            <a class="link" href="{% url 'eventos:evento_list' %}">Ver detalle</a>
                         </article>
                     {% empty %}
                         <div class="empty-state">
@@ -82,6 +82,12 @@
             </section>
         </main>
     </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
+
+
+
+
 

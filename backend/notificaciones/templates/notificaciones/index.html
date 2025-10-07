@@ -7,7 +7,7 @@
     <title>Notificaciones | Panel</title>
     <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
 </head>
-<body>\n    {% include 'includes/nav.html' %}
+<body>   {% include 'includes/layout_open.html' %}
     <div class="app-shell">
         <header class="app-header">
             <div>
@@ -75,6 +75,9 @@
             </section>
         </main>
     </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
+
 

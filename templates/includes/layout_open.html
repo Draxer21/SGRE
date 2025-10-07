@@ -1,0 +1,48 @@
+﻿{# Layout Open: sidebar + open main #}
+{% with current_app=request.resolver_match.app_name|default:'' %}
+<div class="sgre-layout">
+  <nav class="sgre-sidebar" role="navigation" aria-label="Navegación principal">
+    <div class="sgre-sidebar__brand">
+      <a href="/" class="sgre-sidebar__brand-link">SGRE</a>
+    </div>
+    <div class="sgre-sidebar__links">
+      <a class="sgre-sidebar__link {% if current_app == 'cuentas' %}is-active{% endif %}" href="{% url 'cuentas:panel' %}">Cuentas</a>
+      <a class="sgre-sidebar__link {% if current_app == 'eventos' %}is-active{% endif %}" href="{% url 'eventos:panel' %}">Eventos</a>
+      <a class="sgre-sidebar__link {% if current_app == 'reservas' %}is-active{% endif %}" href="{% url 'reservas:panel' %}">Reservas</a>
+      <a class="sgre-sidebar__link {% if current_app == 'reportes' %}is-active{% endif %}" href="{% url 'reportes:panel' %}">Reportes</a>
+      <a class="sgre-sidebar__link {% if current_app == 'notificaciones' %}is-active{% endif %}" href="{% url 'notificaciones:panel' %}">Notificaciones</a>
+      <a class="sgre-sidebar__link" href="/admin/">Administración</a>
+    </div>
+  </nav>
+  <main class="sgre-main" role="main">
+{% endwith %}
+<style>
+  :root { --sgre-sidebar-w: 240px; }
+  .sgre-layout{ display:flex; min-height:100vh; }
+  .sgre-sidebar{ width:var(--sgre-sidebar-w); background:#0f172a; color:#e5e7eb; border-right:1px solid rgba(255,255,255,.08); padding:14px 12px; position:sticky; top:0; height:100vh; }
+  .sgre-sidebar__brand{ padding:6px 8px 12px; border-bottom:1px solid rgba(255,255,255,.06); margin-bottom:8px }
+  .sgre-sidebar__brand-link{ color:#38bdf8; font-weight:800; text-decoration:none; letter-spacing:.2px }
+  .sgre-sidebar__links{ display:flex; flex-direction:column; gap:6px; padding:8px 4px }
+  .sgre-sidebar__link{ color:#cbd5e1; text-decoration:none; padding:8px 10px; border-radius:8px; display:block }
+  .sgre-sidebar__link:hover{ background:rgba(148,163,184,.15); color:#fff }
+  .sgre-sidebar__link.is-active{ background:rgba(56,189,248,.18); color:#fff; box-shadow:inset 0 0 0 1px rgba(56,189,248,.25) }
+  .sgre-main{ flex:1; min-width:0 }
+  @media (max-width:960px){ .sgre-sidebar{ position:fixed; left:0; transform:translateX(-100%); transition:transform .25s ease; z-index:1000 }
+    .sgre-sidebar.is-open{ transform:translateX(0) } }
+</style>
+<script>
+  (function(){
+    try {
+      var mq = window.matchMedia('(max-width: 960px)');
+      if (!mq.matches) return; // toggle solo en móvil
+      var btn = document.createElement('button');
+      btn.className = 'sgre-sidebar__toggle';
+      btn.type = 'button';
+      btn.textContent = 'Menú';
+      btn.style.position='fixed'; btn.style.top='10px'; btn.style.left='10px'; btn.style.zIndex='1100';
+      document.body.appendChild(btn);
+      var nav = document.querySelector('.sgre-sidebar');
+      btn.addEventListener('click', function(){ nav.classList.toggle('is-open'); });
+    } catch (e) { /* noop */ }
+  })();
+</script>

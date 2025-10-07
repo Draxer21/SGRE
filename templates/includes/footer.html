@@ -1,0 +1,75 @@
+﻿{# Global dark footer inspired by multi-column layout #}
+{% load tz %}
+<footer class="sgre-footer sgre-footer--dark" role="contentinfo">
+  <div class="sgre-footer__wrap">
+    <div class="sgre-footer__top">
+      <div class="sgre-footer__brand">
+        <div class="sgre-footer__logo" aria-label="SGRE">SGRE</div>
+        <p class="sgre-footer__mission">
+          Nuestra misión es impulsar una gestión pública moderna, transparente
+          y centrada en las personas a través de procesos, datos y colaboración.
+        </p>
+      </div>
+      <div class="sgre-footer__cols">
+        <nav class="sgre-footer__col" aria-label="General">
+          <h3 class="sgre-footer__title">Panorama</h3>
+          <ul class="sgre-footer__list">
+            <li><a class="sgre-footer__link" href="/reportes/">Reportes</a></li>
+            <li><a class="sgre-footer__link" href="/eventos/">Eventos</a></li>
+            <li><a class="sgre-footer__link" href="/reservas/">Reservas</a></li>
+            <li><a class="sgre-footer__link" href="/notificaciones/">Notificaciones</a></li>
+          </ul>
+        </nav>
+        <nav class="sgre-footer__col" aria-label="Recursos">
+          <h3 class="sgre-footer__title">Recursos</h3>
+          <ul class="sgre-footer__list">
+            <li><a class="sgre-footer__link" href="/api/docs/">Documentación API</a></li>
+            <li><a class="sgre-footer__link" href="/api/redoc/">ReDoc</a></li>
+            <li><a class="sgre-footer__link" href="/admin/">Administración</a></li>
+            <li><a class="sgre-footer__link" href="#">Políticas y términos</a></li>
+          </ul>
+        </nav>
+        <nav class="sgre-footer__col" aria-label="Comunidad">
+          <h3 class="sgre-footer__title">Comunidad</h3>
+          <ul class="sgre-footer__list">
+            <li><a class="sgre-footer__link" href="#">Transparencia</a></li>
+            <li><a class="sgre-footer__link" href="#">Blog</a></li>
+            <li><a class="sgre-footer__link" href="#">Contacto</a></li>
+            <li><a class="sgre-footer__link" href="#">Soporte</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    <div class="sgre-footer__bottom">
+      <p class="sgre-footer__copy">© {% now "Y" %} SGRE • Todos los derechos reservados</p>
+      <div class="sgre-footer__badges" aria-label="Sellos y medios aceptados">
+        <span class="sgre-badge">SSL</span>
+        <span class="sgre-badge">ISO</span>
+        <span class="sgre-badge">GDPR</span>
+      </div>
+    </div>
+  </div>
+</footer>
+<style>
+  .sgre-footer{margin-top:32px}
+  .sgre-footer--dark{background:var(--footer-bg,#1f1b2b);color:var(--footer-fg,#e9e7ef)}
+  .sgre-footer__wrap{max-width:1200px;margin:0 auto;padding:48px 20px}
+  .sgre-footer__top{display:grid;grid-template-columns:1.2fr 2fr;gap:32px;align-items:start}
+  .sgre-footer__brand{display:grid;gap:16px}
+  .sgre-footer__logo{font-weight:800;letter-spacing:.3px;font-size:1.4rem;color:var(--footer-fg,#ffffff)}
+  .sgre-footer__mission{margin:0;color:var(--footer-muted,#c9c6d6);line-height:1.6}
+  .sgre-footer__cols{display:grid;grid-template-columns:repeat(3,minmax(180px,1fr));gap:24px}
+  .sgre-footer__title{margin:0 0 10px;color:#ffffff;font-weight:700;font-size:1rem}
+  .sgre-footer__list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .sgre-footer__link{color:var(--footer-link,#b7b3c7);text-decoration:none;border-bottom:1px solid transparent;display:inline-block}
+  .sgre-footer__link:hover{color:var(--footer-link-hover,#fff);border-bottom-color:var(--footer-link-underline,rgba(255,255,255,.35))}
+  .sgre-footer__bottom{margin-top:32px;padding-top:16px;border-top:1px solid var(--footer-border,rgba(255,255,255,.1));display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .sgre-footer__copy{margin:0;color:var(--footer-muted,#c9c6d6)}
+  .sgre-footer__badges{display:flex;gap:8px;align-items:center}
+  .sgre-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 10px;border-radius:6px;background:var(--footer-badge-bg,#2b253a);color:var(--footer-fg,#e9e7ef);font-size:.85rem;border:1px solid var(--footer-badge-border,rgba(255,255,255,.12))}
+  @media (max-width: 960px){
+    .sgre-footer__top{grid-template-columns:1fr}
+    .sgre-footer__cols{grid-template-columns:repeat(2,minmax(160px,1fr))}
+  }
+</style>
+

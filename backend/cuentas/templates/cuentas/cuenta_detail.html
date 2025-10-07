@@ -1,4 +1,16 @@
-﻿{% include 'includes/nav.html' %}
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SGRE</title>
+  <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+
 <div class="surface" style="margin:16px; max-width:680px;">
   <h2 class="section-title">{{ object.nombre }}</h2>
   <p class="card__meta">Correo: {{ object.email }}</p>
@@ -9,3 +21,10 @@
     <a class="btn btn--ghost" href="{% url 'cuentas:cuenta_list' %}">Volver</a>
   </div>
 </div>
+
+  </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+</body>
+</html>
+
+

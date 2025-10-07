@@ -7,7 +7,7 @@
     <title>Reportes | Analítica</title>
     <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
 </head>
-<body>\n    {% include 'includes/nav.html' %}
+<body>   {% include 'includes/layout_open.html' %}
     <div class="app-shell">
         <header class="app-header">
             <div>
@@ -15,8 +15,8 @@
                 <p class="app-subtitle">Monitorea desempeño, asistencia y comunicaciones.</p>
             </div>
             <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'reportes:generar' %}">Generar reporte</a>
-                <a class="btn btn--ghost" href="{% url 'reportes:exportar' %}">Exportar datos</a>
+                <a class="btn btn--primary" href="{% url 'reportes:reporte_create' %}">Generar reporte</a>
+                <a class="btn btn--ghost" href="{% url 'reportes:reporte_list' %}">Exportar datos</a>
             </div>
         </header>
 
@@ -48,7 +48,7 @@
                                 <span class="card__meta">{{ reporte.fecha|date:"d/m/Y" }}</span>
                             </div>
                             <p class="card__meta">{{ reporte.descripcion }}</p>
-                            <a class="link" href="{% url 'reportes:generar' %}">Recalcular</a>
+                            <a class="link" href="{% url 'reportes:reporte_create' %}">Recalcular</a>
                         </article>
                     {% empty %}
                         <div class="empty-state">
@@ -91,6 +91,11 @@
             </section>
         </main>
     </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
+
+
+
 

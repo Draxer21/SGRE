@@ -2,106 +2,83 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cuentas | Iniciar sesión</title>
-    <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cuentas | Iniciar sesión</title>
+  <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
 </head>
-<body>\n    {% include 'includes/nav.html' %}
-    <div class="app-shell">
-        <header class="app-header">
-            <div>
-                <h1 class="app-title">Portal de Cuentas</h1>
-                <p class="app-subtitle">Accede con tus credenciales institucionales.</p>
-            </div>
-        </header>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <div class="surface" style="margin:16px; max-width:480px;">
+      <h2 class="section-title">Iniciar sesión</h2>
 
-        <main class="grid">
-            <section class="surface" style="max-width: 420px; margin: 0 auto;">
-                <h2 class="section-title">Iniciar sesión</h2>
+      {% if form.non_field_errors %}
+        <div class="empty-state" role="alert" aria-live="assertive">
+          Errores:
+          <ul>
+            {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
 
-                {% if form and form.non_field_errors %}
-                    <div class="badge" style="background: rgba(239, 68, 68, 0.18); color: #b91c1c; margin-bottom: 16px;">
-                        {{ form.non_field_errors|join:', ' }}
-                    </div>
-                {% endif %}
+      <form id="login-form" method="post" class="grid" style="gap:14px;" novalidate>
+        {% csrf_token %}
 
-                <form id="login-form" method="post" novalidate>
-                    {% csrf_token %}
-                    <div class="grid" style="gap:16px;">
-                        <label style="display:block;">
-                            <span class="card__meta">Usuario</span>
-                            <input type="text" name="username" placeholder="usuario@municipio" required autofocus value="{% if form %}{{ form.username.value|default:'' }}{% endif %}">
-                            {% if form and form.username.errors %}
-                                <span class="card__meta" style="color:#b91c1c;">{{ form.username.errors|join:', ' }}</span>
-                            {% endif %}
-                        </label>
+        {% include 'includes/form_field.html' with field=form.username %}
+        {% include 'includes/form_field.html' with field=form.password_plain %}
 
-                        <label style="display:block;">
-                            <span class="card__meta">Contraseña</span>
-                            <input type="password" id="password" name="password_plain" placeholder="••••••••" required>
-                            {% if form and form.password.errors %}
-                                <span class="card__meta" style="color:#b91c1c;">{{ form.password.errors|join:', ' }}</span>
-                            {% endif %}
-                        </label>
+        <div>
+          <label class="card__title" for="id_remember">{{ form.remember.label }}</label>
+          {{ form.remember }}
+        </div>
 
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <label style="display:flex; align-items:center; gap:8px;">
-                                <input type="checkbox" name="remember" value="1">
-                                <span class="card__meta">Recordar sesión</span>
-                            </label>
-                            <a class="link" href="#">¿Olvidaste tu contraseña?</a>
-                        </div>
+        {# Campo oculto para el hash SHA-256 #}
+        <input type="hidden" id="password-hash" name="password" value="">
 
-                        <input type="hidden" id="password-hash" name="password" value="">
-
-                        <button type="submit" class="btn btn--primary">Entrar</button>
-                    </div>
-                </form>
-            </section>
-        </main>
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <button class="btn btn--primary" type="submit">Entrar</button>
+          <a class="btn btn--ghost" href="{% url 'cuentas:panel' %}">Cancelar</a>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <script>
-        async function sha256Hex(value) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(value);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+  <script>
+    async function sha256Hex(value) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(value);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('login-form');
+      const passwordField = document.getElementById('id_password_plain');
+      const hashField = document.getElementById('password-hash');
+      if (!form || !passwordField || !hashField) return;
+
+      if (!window.crypto || !window.crypto.subtle) {
+        // Si no hay Web Crypto, envía password_plain y el servidor calculará hash.
+        return;
+      }
+
+      form.addEventListener('submit', async (ev) => {
+        if (!passwordField.value) return; // deja que el validador actúe
+        ev.preventDefault();
+        try {
+          const hashed = await sha256Hex(passwordField.value);
+          hashField.value = hashed;
+          passwordField.value = '';
+          form.submit();
+        } catch (e) {
+          form.submit();
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.getElementById('login-form');
-            const passwordField = document.getElementById('password');
-            const hashField = document.getElementById('password-hash');
-
-            if (!window.crypto || !window.crypto.subtle) {
-                console.warn('SHA-256 Web Crypto API no disponible; la contraseña se enviará en texto plano.');
-                passwordField.setAttribute('name', 'password');
-                hashField.parentElement.removeChild(hashField);
-                return;
-            }
-
-            form.addEventListener('submit', async (event) => {
-                if (!passwordField.value) {
-                    return;
-                }
-
-                event.preventDefault();
-
-                try {
-                    const hashed = await sha256Hex(passwordField.value);
-                    hashField.value = hashed;
-                    passwordField.value = '';
-                    form.submit();
-                } catch (error) {
-                    console.error('Error generando hash SHA-256', error);
-                    form.submit();
-                }
-            });
-        });
-    </script>
+      });
+    });
+  </script>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
 

@@ -1,4 +1,16 @@
-﻿{% include 'includes/nav.html' %}
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SGRE</title>
+  <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+
 <div class="surface" style="margin:16px; max-width:680px;">
   <h2 class="section-title">Eliminar reporte</h2>
   <p class="card__meta">¿Eliminar definitivamente <strong>{{ object.titulo }}</strong> del {{ object.fecha|date:'d/m/Y' }}?</p>
@@ -8,3 +20,10 @@
     <a class="btn btn--ghost" href="{% url 'reportes:reporte_list' %}">Cancelar</a>
   </form>
 </div>
+
+  </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+</body>
+</html>
+
+

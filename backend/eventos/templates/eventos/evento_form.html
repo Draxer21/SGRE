@@ -1,12 +1,123 @@
-﻿{% include 'includes/nav.html' %}
-<div class="surface" style="margin:16px; max-width:700px;">
-  <h2 class="section-title">{{ view.object|default:'Nuevo evento' }}</h2>
-  <form method="post" class="grid" style="gap:14px;">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
-      <button class="btn btn--primary" type="submit">Guardar</button>
-      <a class="btn btn--ghost" href="{% url 'eventos:evento_list' %}">Cancelar</a>
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Eventos | {{ view.object.pk|default:'Nuevo' }}</title>
+  <link rel="stylesheet" href="{% static 'css/eventos.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <div class="surface" style="margin:16px; max-width:720px;">
+      <h2 class="section-title">{{ view.object|default:'Nuevo evento' }}</h2>
+
+      {% if form.non_field_errors %}
+      <div class="empty-state" role="alert" aria-live="assertive">
+        Errores en el formulario:
+        <ul>
+          {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" class="grid" style="gap:14px;" novalidate>
+        {% csrf_token %}
+
+        {# Campo: Título #}
+        {% with field=form.titulo %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        {# Campo: Fecha #}
+        {% with field=form.fecha %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        {# Campo: Hora #}
+        {% with field=form.hora %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        {# Campo: Lugar #}
+        {% with field=form.lugar %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        {# Campo: Estado #}
+        {% with field=form.estado %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }} <span aria-hidden="true">*</span></label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        {# Campo: Descripción #}
+        {% with field=form.descripcion %}
+        <div>
+          <label for="{{ field.id_for_label }}" class="card__title">{{ field.label }}</label>
+          {% if field.help_text %}<p id="{{ field.id_for_label }}_help" class="card__meta">{{ field.help_text }}</p>{% endif %}
+          {{ field }}
+          {% if field.errors %}
+            <ul class="card__meta" role="alert">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+        {% endwith %}
+
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <button class="btn btn--primary" type="submit">Guardar</button>
+          <a class="btn btn--ghost" href="{% url 'eventos:evento_list' %}">Cancelar</a>
+        </div>
+      </form>
     </div>
-  </form>
-</div>
+  </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+</body>
+</html>
+
+

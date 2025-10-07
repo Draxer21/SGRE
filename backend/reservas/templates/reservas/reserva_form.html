@@ -1,12 +1,46 @@
-﻿{% include 'includes/nav.html' %}
-<div class="surface" style="margin:16px; max-width:700px;">
-  <h2 class="section-title">{{ view.object|default:'Nueva reserva' }}</h2>
-  <form method="post" class="grid" style="gap:14px;">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
-      <button class="btn btn--primary" type="submit">Guardar</button>
-      <a class="btn btn--ghost" href="{% url 'reservas:reserva_list' %}">Cancelar</a>
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reservas | {{ view.object.pk|default:'Nueva' }}</title>
+  <link rel="stylesheet" href="{% static 'css/reservas.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <div class="surface" style="margin:16px; max-width:720px;">
+      <h2 class="section-title">{{ view.object|default:'Nueva reserva' }}</h2>
+
+      {% if form.non_field_errors %}
+      <div class="empty-state" role="alert" aria-live="assertive">
+        Errores en el formulario:
+        <ul>
+          {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" class="grid" style="gap:14px;" novalidate>
+        {% csrf_token %}
+        {% include 'includes/form_field.html' with field=form.codigo %}
+        {% include 'includes/form_field.html' with field=form.espacio %}
+        {% include 'includes/form_field.html' with field=form.fecha %}
+        {% include 'includes/form_field.html' with field=form.hora %}
+        {% include 'includes/form_field.html' with field=form.solicitante %}
+        {% include 'includes/form_field.html' with field=form.estado %}
+        {% include 'includes/form_field.html' with field=form.notas %}
+
+        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+          <button class="btn btn--primary" type="submit">Guardar</button>
+          <a class="btn btn--ghost" href="{% url 'reservas:reserva_list' %}">Cancelar</a>
+        </div>
+      </form>
     </div>
-  </form>
-</div>
+  </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
+</body>
+</html>
+
+

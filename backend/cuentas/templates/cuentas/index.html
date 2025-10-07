@@ -7,7 +7,7 @@
     <title>Cuentas | Panel</title>
     <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
 </head>
-<body>    {% include 'includes/nav.html' %}
+<body>    {% include 'includes/layout_open.html' %}
     <div class="app-shell">
         <header class="app-header">
             <div>
@@ -15,7 +15,7 @@
                 <p class="app-subtitle">Gestiona perfiles, accesos y sesiones activas.</p>
             </div>
             <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'cuentas:nuevo' %}">Crear usuario</a>
+                <a class="btn btn--primary" href="{% url 'cuentas:cuenta_create' %}">Crear usuario</a>
                 <a class="btn btn--ghost" href="{% url 'cuentas:login' %}">Cerrar sesión</a>
             </div>
         </header>
@@ -32,7 +32,7 @@
                                 <p class="card__meta">{{ usuario.rol }}</p>
                                 <p class="card__meta">Último acceso {{ usuario.ultimo_acceso|date:"d/m/Y H:i" }}</p>
                             </div>
-                            <a class="link" href="{% url 'cuentas:detalle' usuario.id %}">Ver perfil</a>
+                            <a class="link" href="{% url 'cuentas:cuenta_list' %}">Ver perfil</a>
                         </article>
                     {% empty %}
                         <div class="empty-state">
@@ -62,6 +62,12 @@
             </section>
         </main>
     </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
+
+
+
+
 

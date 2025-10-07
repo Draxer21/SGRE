@@ -7,7 +7,7 @@
     <title>Reservas | Control</title>
     <link rel="stylesheet" href="{% static 'css/reservas.css' %}">
 </head>
-<body>\n    {% include 'includes/nav.html' %}
+<body>    {% include 'includes/layout_open.html' %}
     <div class="app-shell">
         <header class="app-header">
             <div>
@@ -15,7 +15,7 @@
                 <p class="app-subtitle">Administra espacios, cupos y solicitudes en tiempo real.</p>
             </div>
             <div class="grid" style="gap:12px; grid-auto-flow:column;">
-                <a class="btn btn--primary" href="{% url 'reservas:nueva' %}">Nueva reserva</a>
+                <a class="btn btn--primary" href="{% url 'reservas:reserva_create' %}">Nueva reserva</a>
                 <a class="btn btn--ghost" href="{% url 'cuentas:panel' %}">Portal de cuentas</a>
             </div>
         </header>
@@ -111,6 +111,11 @@
             </section>
         </main>
     </div>
+  {% include 'includes/footer.html' %}\n{% include 'includes/layout_close.html' %}
 </body>
 </html>
+
+
+
+
 
