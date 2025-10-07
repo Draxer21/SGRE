@@ -1,0 +1,115 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reservas | Control</title>
+    <link rel="stylesheet" href="{% static 'css/reservas.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1 class="app-title">Gestión de Reservas</h1>
+                <p class="app-subtitle">Administra espacios, cupos y solicitudes en tiempo real.</p>
+            </div>
+            <div class="grid" style="gap:12px; grid-auto-flow:column;">
+                <a class="btn btn--primary" href="{% url 'reservas:nueva' %}">Nueva reserva</a>
+                <a class="btn btn--ghost" href="{% url 'cuentas:panel' %}">Portal de cuentas</a>
+            </div>
+        </header>
+
+        <main class="grid">
+            <section class="surface">
+                <h2 class="section-title">Reservas activas</h2>
+                <div class="card" style="padding:0;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Espacio</th>
+                                <th>Fecha</th>
+                                <th>Solicitante</th>
+                                <th>Ocupación</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reserva in reservas_activas %}
+                                <tr>
+                                    <td>{{ reserva.codigo }}</td>
+                                    <td>{{ reserva.espacio }}</td>
+                                    <td>{{ reserva.fecha|date:"d/m/Y" }} {{ reserva.hora|time:"H:i" }}</td>
+                                    <td>{{ reserva.solicitante }}</td>
+                                    <td>
+                                        <div class="capacity">
+                                            <span>{{ reserva.ocupacion }}%</span>
+                                            <div class="capacity-bar">
+                                                <span style="width: {{ reserva.ocupacion }}%;"></span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><a class="link" href="{% url 'reservas:cancelar' reserva.codigo %}">Gestionar</a></td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            No tienes reservas activas.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="surface">
+                <h2 class="section-title">Capacidad por espacio</h2>
+                <div class="grid grid--two-columns">
+                    {% for espacio in espacios %}
+                        <article class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">{{ espacio.nombre }}</h3>
+                                <span class="tag">Capacidad {{ espacio.capacidad }}</span>
+                            </div>
+                            <p class="card__meta">Ocupados: {{ espacio.ocupados }} • Disponibles: {{ espacio.disponibles }}</p>
+                            <div class="capacity" style="width:100%;">
+                                <div class="capacity-bar">
+                                    <span style="width: {{ espacio.ocupacion }}%;"></span>
+                                </div>
+                                <span>{{ espacio.ocupacion }}%</span>
+                            </div>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            Crea espacios para comenzar a medir la ocupación.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="surface">
+                <h2 class="section-title">Solicitudes en espera</h2>
+                <div class="grid">
+                    {% for solicitud in espera %}
+                        <article class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">{{ solicitud.solicitante }}</h3>
+                                <span class="tag">{{ solicitud.estado }}</span>
+                            </div>
+                            <p class="card__meta">Espacio solicitado: {{ solicitud.espacio }}</p>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            No hay solicitudes pendientes.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

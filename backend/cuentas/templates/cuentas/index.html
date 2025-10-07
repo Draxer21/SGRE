@@ -1,0 +1,66 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cuentas | Panel</title>
+    <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1 class="app-title">Administración de Cuentas</h1>
+                <p class="app-subtitle">Gestiona perfiles, accesos y sesiones activas.</p>
+            </div>
+            <div class="grid" style="gap:12px; grid-auto-flow:column;">
+                <a class="btn btn--primary" href="{% url 'cuentas:nuevo' %}">Crear usuario</a>
+                <a class="btn btn--ghost" href="{% url 'cuentas:login' %}">Cerrar sesión</a>
+            </div>
+        </header>
+
+        <main class="grid grid--two-columns">
+            <section class="surface">
+                <h2 class="section-title">Usuarios registrados</h2>
+                <div class="user-list">
+                    {% for usuario in usuarios %}
+                        <article class="user-row">
+                            <div class="avatar">{{ usuario.iniciales }}</div>
+                            <div>
+                                <p class="card__title" style="margin:0;">{{ usuario.nombre }}</p>
+                                <p class="card__meta">{{ usuario.rol }}</p>
+                                <p class="card__meta">Último acceso {{ usuario.ultimo_acceso|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <a class="link" href="{% url 'cuentas:detalle' usuario.id %}">Ver perfil</a>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            No se encontraron usuarios registrados.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="surface">
+                <h2 class="section-title">Actividad reciente</h2>
+                <div class="grid">
+                    {% for acceso in accesos %}
+                        <article class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">{{ acceso.usuario }}</h3>
+                                <span class="card__meta">{{ acceso.fecha|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <p class="card__meta">{{ acceso.descripcion }}</p>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            Sin actividad registrada.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

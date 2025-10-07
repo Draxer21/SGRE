@@ -1,0 +1,95 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reportes | Analítica</title>
+    <link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1 class="app-title">Reportes e Indicadores</h1>
+                <p class="app-subtitle">Monitorea desempeño, asistencia y comunicaciones.</p>
+            </div>
+            <div class="grid" style="gap:12px; grid-auto-flow:column;">
+                <a class="btn btn--primary" href="{% url 'reportes:generar' %}">Generar reporte</a>
+                <a class="btn btn--ghost" href="{% url 'reportes:exportar' %}">Exportar datos</a>
+            </div>
+        </header>
+
+        <main class="grid grid--two-columns">
+            <section class="surface">
+                <h2 class="section-title">Indicadores clave</h2>
+                <div class="grid grid--two-columns">
+                    {% for indicador in indicadores %}
+                        <article class="card metric">
+                            <span class="card__meta">{{ indicador.nombre }}</span>
+                            <span class="metric__value">{{ indicador.valor }}</span>
+                            <span class="metric__trend">{{ indicador.tendencia }}</span>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            Aún no hay indicadores configurados.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="surface">
+                <h2 class="section-title">Reportes publicados</h2>
+                <div class="grid">
+                    {% for reporte in reportes %}
+                        <article class="card">
+                            <div class="card__header">
+                                <h3 class="card__title">{{ reporte.titulo }}</h3>
+                                <span class="card__meta">{{ reporte.fecha|date:"d/m/Y" }}</span>
+                            </div>
+                            <p class="card__meta">{{ reporte.descripcion }}</p>
+                            <a class="link" href="{% url 'reportes:generar' %}">Recalcular</a>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">
+                            No se han generado reportes.
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="surface">
+                <h2 class="section-title">Serie de datos recientes</h2>
+                <div class="card" style="padding:0;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Valor actual</th>
+                                <th>Variación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for serie in series %}
+                                <tr>
+                                    <td>{{ serie.nombre }}</td>
+                                    <td>{{ serie.valor }}</td>
+                                    <td>{{ serie.variacion }}</td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="3">
+                                        <div class="empty-state">
+                                            Sin datos disponibles.
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

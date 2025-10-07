@@ -1,0 +1,106 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cuentas | Iniciar sesión</title>
+    <link rel="stylesheet" href="{% static 'css/cuentas.css' %}">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="app-header">
+            <div>
+                <h1 class="app-title">Portal de Cuentas</h1>
+                <p class="app-subtitle">Accede con tus credenciales institucionales.</p>
+            </div>
+        </header>
+
+        <main class="grid">
+            <section class="surface" style="max-width: 420px; margin: 0 auto;">
+                <h2 class="section-title">Iniciar sesión</h2>
+
+                {% if form and form.non_field_errors %}
+                    <div class="badge" style="background: rgba(239, 68, 68, 0.18); color: #b91c1c; margin-bottom: 16px;">
+                        {{ form.non_field_errors|join:', ' }}
+                    </div>
+                {% endif %}
+
+                <form id="login-form" method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="grid" style="gap:16px;">
+                        <label style="display:block;">
+                            <span class="card__meta">Usuario</span>
+                            <input type="text" name="username" placeholder="usuario@municipio" required autofocus value="{% if form %}{{ form.username.value|default:'' }}{% endif %}">
+                            {% if form and form.username.errors %}
+                                <span class="card__meta" style="color:#b91c1c;">{{ form.username.errors|join:', ' }}</span>
+                            {% endif %}
+                        </label>
+
+                        <label style="display:block;">
+                            <span class="card__meta">Contraseña</span>
+                            <input type="password" id="password" name="password_plain" placeholder="••••••••" required>
+                            {% if form and form.password.errors %}
+                                <span class="card__meta" style="color:#b91c1c;">{{ form.password.errors|join:', ' }}</span>
+                            {% endif %}
+                        </label>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <label style="display:flex; align-items:center; gap:8px;">
+                                <input type="checkbox" name="remember" value="1">
+                                <span class="card__meta">Recordar sesión</span>
+                            </label>
+                            <a class="link" href="#">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <input type="hidden" id="password-hash" name="password" value="">
+
+                        <button type="submit" class="btn btn--primary">Entrar</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function sha256Hex(value) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(value);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('login-form');
+            const passwordField = document.getElementById('password');
+            const hashField = document.getElementById('password-hash');
+
+            if (!window.crypto || !window.crypto.subtle) {
+                console.warn('SHA-256 Web Crypto API no disponible; la contraseña se enviará en texto plano.');
+                passwordField.setAttribute('name', 'password');
+                hashField.parentElement.removeChild(hashField);
+                return;
+            }
+
+            form.addEventListener('submit', async (event) => {
+                if (!passwordField.value) {
+                    return;
+                }
+
+                event.preventDefault();
+
+                try {
+                    const hashed = await sha256Hex(passwordField.value);
+                    hashField.value = hashed;
+                    passwordField.value = '';
+                    form.submit();
+                } catch (error) {
+                    console.error('Error generando hash SHA-256', error);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
