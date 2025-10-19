@@ -1,0 +1,265 @@
+:root {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  background-color: #f5f7fb;
+  color: #1f2933;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background-color: #1d4ed8;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+button:hover {
+  background-color: #1e40af;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+li strong {
+  display: block;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  background-color: #f5f7fb;
+}
+
+.app-shell__sidebar {
+  background: #111827;
+  color: #f9fafb;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.app-shell__brand {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.brand__subtitle {
+  font-size: 0.85rem;
+  color: rgba(249, 250, 251, 0.7);
+}
+
+.app-shell__nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.nav__link {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background-color: transparent;
+  color: rgba(249, 250, 251, 0.8);
+  transition: background-color 0.2s ease;
+}
+
+.nav__link:hover,
+.nav__link--active {
+  background-color: rgba(59, 130, 246, 0.25);
+  color: #ffffff;
+}
+
+.app-shell__content {
+  display: flex;
+  flex-direction: column;
+  padding: 32px;
+  gap: 24px;
+}
+
+.app-shell__header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.app-shell__intro {
+  margin: 8px 0 0;
+  color: #52606d;
+}
+
+.app-shell__main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.card-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.card-grid--two {
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #1d4ed8;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table thead {
+  background-color: #e5edff;
+  color: #1f2933;
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: rgba(229, 237, 255, 0.35);
+}
+
+.table tbody tr:nth-child(odd) {
+  background-color: rgba(229, 237, 255, 0.18);
+}
+
+.status-pill {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pill--confirmado {
+  background-color: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+
+.status-pill--convocatoria {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #1d4ed8;
+}
+
+.status-pill--borrador {
+  background-color: rgba(107, 114, 128, 0.15);
+  color: #374151;
+}
+
+.status-pill--pendiente {
+  background-color: rgba(250, 204, 21, 0.25);
+  color: #92400e;
+}
+
+.status-pill--cancelada {
+  background-color: rgba(248, 113, 113, 0.2);
+  color: #b91c1c;
+}
+
+.status-pill--confirmada {
+  background-color: rgba(16, 185, 129, 0.14);
+  color: #047857;
+}
+
+.empty-state {
+  padding: 24px;
+  border-radius: 12px;
+  background-color: rgba(15, 23, 42, 0.05);
+  text-align: center;
+  color: #52606d;
+}
+
+.loader {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(59, 130, 246, 0.25);
+  border-top-color: #1d4ed8;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 960px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .app-shell__sidebar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .app-shell__nav {
+    flex-direction: row;
+  }
+}

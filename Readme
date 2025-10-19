@@ -1,59 +1,124 @@
-﻿🏛️ Sistema de Gestión de Reservas y Eventos (SGRE)
-Proyecto de Integración – Ingeniería en Informática
+# SGRE - Sistema de Gestion de Reservas y Eventos
 
-INACAP 2025 | Área Informática y Telecomunicaciones
-Asignatura: Proyecto de Integración – TIHI63
+Proyecto de integracion de Ingenieria en Informatica (INACAP 2025).
 
-📘 Descripción General
+## Stack principal
 
-El Sistema de Gestión de Reservas y Eventos (SGRE) es una solución web desarrollada en Django + Django REST Framework, diseñada para automatizar la gestión de eventos, reservas y reportes administrativos en instituciones públicas o privadas.
+- **Frontend:** React 18 + Vite, React Router, Axios.
+- **Backend:** Django 5 + Django REST Framework.
+- **Base de datos:** PostgreSQL 15.
+- **Documentacion de API:** drf-spectacular (Swagger / Redoc).
 
-Integra los flujos de trabajo descritos en los diagramas BPMN y Casos de Uso documentados en el informe, permitiendo:
+## Arquitectura
 
-- Gestión eficiente de eventos institucionales.
-- Control de reservas, cupos y ocupación.
-- Emisión automatizada de reportes y notificaciones.
-- Administración de usuarios, roles y trazabilidad.
+### Frontend (React)
 
-🧩 Arquitectura del Sistema
+- Codigo fuente en `frontend/src`.
+- Vite se usa para desarrollo (`npm run dev`) y construccion (`npm run build`).
+- El build queda en `frontend/dist`; Django lo sirve como archivos estaticos en despliegue.
+- Proxy de desarrollo configurado para reenviar `/api/*` a `http://localhost:8000`.
 
-Modelo 3-Tier (cliente–servidor–BD)
+Paginas iniciales implementadas:
 
-Frontend (Cliente)      → React.js / HTML / CSS (por módulo)
-Backend (Servidor)      → Django REST Framework 5.1 (API REST)
-Base de Datos           → PostgreSQL 15
+- `/dashboard`: panel general con resumen de eventos, reservas e indicadores.
+- `/eventos`: listado de eventos con su estado.
+- `/reservas`: reservas registradas.
+- `/reportes`: reportes administrativos publicados o en borrador.
 
-Diagrama conceptual
+### Backend (Django + DRF)
 
-- Capa de presentación: Plantillas HTML y CSS por app (templates/<app>/, static/<app>/).
-- Capa lógica: Vistas y controladores (views.py, urls.py).
-- Capa de datos: Modelos ORM (models.py), conforme al diagrama de modelado de datos.
+- Proyecto ubicado en `backend/`.
+- Rutas `api/` exponen CRUD para eventos, reservas y reportes.
+- Endpoint `api/dashboard/overview/` entrega los datos resumidos que consume el panel React.
+- CORS habilitado para `http://localhost:5173` con cookies compartidas (sesiones Django).
 
-📦 Estructura de Carpetas
+### Estructura relevante
 
+```
 SGRE/
 ├── backend/
-│   ├── municipal_backend/          # Configuración principal de Django
-│   ├── cuentas/                    # Autenticación y roles
-│   ├── eventos/                    # Gestión de eventos
-│   ├── reservas/                   # Gestión de reservas
-│   ├── reportes/                   # Reportes y estadísticas
-│   └── notificaciones/             # Envío de correos y alertas
-│
-├── static/                         # Recursos globales compartidos (CSS, JS, imágenes)
-├── templates/                      # Plantillas globales (base.html, includes, etc.)
-├── docs/                           # Diagramas UML / BPMN / Modelado de Datos
-│   ├── Casos_Uso/
-│   ├── BPMN/
-│   ├── Componentes/
-│   ├── Modelo_Datos/
-│   └── Procesos/
-└── README.md
+│   ├── municipal_backend/
+│   │   ├── api_router.py        # DefaultRouter con viewsets
+│   │   ├── api_views.py         # Dashboards agregados
+│   │   ├── settings.py
+│   │   └── urls.py
+│   ├── eventos/api.py           # Serializer + ViewSet
+│   ├── reservas/api.py
+│   └── reportes/api.py
+├── frontend/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   └── services/
+│   ├── package.json
+│   └── vite.config.js
+└── requirements.txt
+```
 
-⚙️ Mapeo de Requerimientos Funcionales
-Módulo	Requerimientos Funcionales Asociados
-cuentas	RF-01: Autenticación de usuarios, roles y permisos.
-eventos	RF-02 al RF-06: Registro, publicación, modificación y gestión de eventos.
-reservas	RF-07 al RF-13: Registro y control de reservas, cálculo de cupos, cancelaciones.
-reportes	RF-14 al RF-16: Generación de reportes de asistencia, ocupación e indicadores.
-notificaciones	RF-10 y RF-16: Envío de correos y alertas automáticas.
+## Puesta en marcha local
+
+### Backend (Django)
+
+1. Crear y activar entorno virtual (ejemplo con PowerShell):
+   ```
+   py -3 -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+2. Instalar dependencias:
+   ```
+   pip install -r requirements.txt
+   ```
+3. Configurar variables en `.env` (opcional, ver `settings.py` para valores por defecto).
+4. Ejecutar migraciones y cargar datos necesarios:
+   ```
+   python manage.py migrate
+   python manage.py createsuperuser  # si se requiere acceso admin
+   ```
+5. Servir API:
+   ```
+   python manage.py runserver
+   ```
+
+### Frontend (React)
+
+1. Instalar Node.js 20 LTS (recomendado).
+2. Instalar dependencias del proyecto:
+   ```
+   cd frontend
+   npm install
+   ```
+3. Ejecutar modo desarrollo (abre http://localhost:5173):
+   ```
+   npm run dev
+   ```
+4. Construir artefactos para produccion (salida en `frontend/dist`):
+   ```
+   npm run build
+   ```
+   Django detecta automaticamente la carpeta `dist` y la sirve como estaticos cuando existe.
+
+## Endpoints principales
+
+- `GET /api/dashboard/overview/` resumen para el panel React.
+- `GET|POST /api/eventos/` y `GET|PUT|PATCH|DELETE /api/eventos/{id}/`.
+- `GET|POST /api/reservas/` y `GET|PUT|PATCH|DELETE /api/reservas/{id}/`.
+- `GET|POST /api/reportes/` y `GET|PUT|PATCH|DELETE /api/reportes/{id}/`.
+- `GET /api/schema/` OpenAPI, `GET /api/docs/` Swagger UI.
+
+Los viewsets soportan filtros (`?estado=confirmado`, `?fecha=2025-07-01`), busqueda (`?search=feria`) y orden (`?ordering=-fecha`).
+
+## Consideraciones de despliegue
+
+- Definir la variable de entorno `FRONTEND_ORIGIN` con la URL publicada del frontend (ej. `https://sgre.municipio.cl`) para CORS y CSRF.
+- Ejecutar `npm run build` durante el pipeline de despliegue y publicar `frontend/dist`.
+- Habilitar `whitenoise` u otro mecanismo de estaticos si se sirve desde Django/Gunicorn.
+- Revisar `REST_FRAMEWORK` si se necesita endurecer permisos para endpoints publicos.
+
+## Tareas futuras sugeridas
+
+1. Implementar autenticacion en el frontend (mantenemos session auth de Django).
+2. Anadir formularios React para crear/editar eventos y reservas.
+3. Automatizar build frontend en el pipeline CI/CD.
+4. Completar modulo de notificaciones (modelo y endpoints).
