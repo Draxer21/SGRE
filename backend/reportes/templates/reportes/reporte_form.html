@@ -10,8 +10,17 @@
 <body>
   {% include 'includes/layout_open.html' %}
   <div class="app-shell">
-    <div class="surface" style="margin:16px; max-width:720px;">
-      <h2 class="section-title">{{ view.object|default:'Nuevo reporte' }}</h2>
+    <div class="surface surface--form">
+      <header class="form-header">
+        <h2 class="form-title">{{ view.object|default:'Nuevo reporte' }}</h2>
+        <p class="form-subtitle">
+          {% if view.object %}
+            Actualiza los detalles del reporte para mantener la información al día.
+          {% else %}
+            Completa la información para registrar un nuevo reporte institucional.
+          {% endif %}
+        </p>
+      </header>
 
       {% if form.non_field_errors %}
       <div class="empty-state" role="alert" aria-live="assertive">
@@ -22,14 +31,14 @@
       </div>
       {% endif %}
 
-      <form method="post" class="grid" style="gap:14px;" novalidate>
+      <form method="post" class="form-grid" novalidate>
         {% csrf_token %}
         {% include 'includes/form_field.html' with field=form.titulo %}
         {% include 'includes/form_field.html' with field=form.fecha %}
         {% include 'includes/form_field.html' with field=form.publicado %}
         {% include 'includes/form_field.html' with field=form.descripcion %}
 
-        <div class="grid" style="grid-auto-flow:column;justify-content:start;gap:12px;">
+        <div class="form-actions">
           <button class="btn btn--primary" type="submit">Guardar</button>
           <a class="btn btn--ghost" href="{% url 'reportes:reporte_list' %}">Cancelar</a>
         </div>
