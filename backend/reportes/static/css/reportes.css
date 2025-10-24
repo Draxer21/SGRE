@@ -229,12 +229,13 @@ body {
 
 /* Footer theme variables */
 :root {
-  --footer-bg: ;
-  --footer-fg: ;
-  --footer-muted: ;
-  --footer-border: ;
-  --footer-link: ;
-  --footer-link-hover: ;
-  --footer-badge-bg: ;
-  --footer-badge-border: ;
+  --footer-bg: linear-gradient(135deg, #c2410c, #7c2d12);
+  --footer-fg: #fff7ed;
+  --footer-muted: rgba(254, 215, 170, 0.78);
+  --footer-border: rgba(253, 186, 116, 0.38);
+  --footer-link: rgba(254, 215, 170, 0.85);
+  --footer-link-hover: #ffffff;
+  --footer-link-underline: rgba(254, 215, 170, 0.55);
+  --footer-badge-bg: rgba(124, 45, 18, 0.55);
+  --footer-badge-border: rgba(253, 186, 116, 0.4);
 }

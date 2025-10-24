@@ -1,9 +1,11 @@
 import StatusPill from "../components/StatusPill.jsx";
 import { useAsync } from "../hooks/useAsync.js";
+import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { listEventos } from "../services/eventsService.js";
 
 function EventsPage() {
   const { data, error, loading, refetch } = useAsync(listEventos, []);
+  useBackendStyles("eventos");
 
   return (
     <section className="card">

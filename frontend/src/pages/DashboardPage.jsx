@@ -1,9 +1,14 @@
+import { useNavigate } from "react-router-dom";
+
 import StatusPill from "../components/StatusPill.jsx";
 import { useAsync } from "../hooks/useAsync.js";
+import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { getDashboardOverview } from "../services/dashboardService.js";
 
 function DashboardPage() {
   const { data, error, loading, refetch } = useAsync(getDashboardOverview, []);
+  const navigate = useNavigate();
+  useBackendStyles("cuentas");
 
   if (loading) {
     return (
@@ -34,6 +39,30 @@ function DashboardPage() {
 
   return (
     <>
+      <section className="card">
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "16px",
+          }}
+        >
+          <div>
+            <h2 className="card__title" style={{ marginBottom: "4px" }}>
+              Administracion completa
+            </h2>
+            <p style={{ margin: 0, color: "#52606d" }}>
+              Accede al backend para gestionar cuentas, eventos, reservas y reportes.
+            </p>
+          </div>
+          <button type="button" onClick={() => navigate("/acceso")}>
+            Iniciar sesion
+          </button>
+        </div>
+      </section>
+
       <section className="card-grid card-grid--two">
         <article className="card">
           <h2 className="card__title">Agenda proxima</h2>

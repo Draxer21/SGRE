@@ -1,6 +1,6 @@
 from datetime import date
 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -57,3 +57,23 @@ class DashboardOverviewAPIView(APIView):
 
         return Response(data)
 
+
+class SessionStatusAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        username = request.session.get("usuario_actual")
+        return Response(
+            {
+                "isAuthenticated": bool(username),
+                "username": username,
+            }
+        )
+
+
+class SessionLogoutAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        request.session.flush()
+        return Response({"detail": "Sesión finalizada"})

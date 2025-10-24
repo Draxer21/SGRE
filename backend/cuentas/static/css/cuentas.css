@@ -247,12 +247,13 @@ textarea:focus {
 
 /* Footer theme variables */
 :root {
-  --footer-bg: ;
-  --footer-fg: ;
-  --footer-muted: ;
-  --footer-border: ;
-  --footer-link: ;
-  --footer-link-hover: ;
-  --footer-badge-bg: ;
-  --footer-badge-border: ;
+  --footer-bg: linear-gradient(135deg, #1d4ed8, #0f172a);
+  --footer-fg: #f8fafc;
+  --footer-muted: rgba(226, 232, 240, 0.78);
+  --footer-border: rgba(148, 163, 184, 0.35);
+  --footer-link: rgba(226, 232, 240, 0.85);
+  --footer-link-hover: #ffffff;
+  --footer-link-underline: rgba(226, 232, 240, 0.55);
+  --footer-badge-bg: rgba(15, 23, 42, 0.6);
+  --footer-badge-border: rgba(148, 163, 184, 0.45);
 }

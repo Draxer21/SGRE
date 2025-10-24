@@ -1,9 +1,11 @@
 import StatusPill from "../components/StatusPill.jsx";
 import { useAsync } from "../hooks/useAsync.js";
+import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { listReservas } from "../services/reservationsService.js";
 
 function ReservationsPage() {
   const { data, error, loading, refetch } = useAsync(listReservas, []);
+  useBackendStyles("reservas");
 
   return (
     <section className="card">

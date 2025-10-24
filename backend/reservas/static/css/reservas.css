@@ -227,6 +227,54 @@ body {
   color: var(--color-muted);
 }
 
+.form-field {
+  display: grid;
+  gap: 6px;
+}
+
+.form-field label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.form-field .card__meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(13, 148, 136, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), background var(--transition-base);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+  outline: none;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+input[type="date"],
+input[type="time"] {
+  padding-inline-end: 8px;
+}
+
 @media (max-width: 960px) {
   .app-shell {
     padding: 24px 16px;
@@ -240,12 +288,13 @@ body {
 
 /* Footer theme variables */
 :root {
-  --footer-bg: ;
-  --footer-fg: ;
-  --footer-muted: ;
-  --footer-border: ;
-  --footer-link: ;
-  --footer-link-hover: ;
-  --footer-badge-bg: ;
-  --footer-badge-border: ;
+  --footer-bg: linear-gradient(135deg, #0f766e, #064e3b);
+  --footer-fg: #ecfdf5;
+  --footer-muted: rgba(224, 242, 254, 0.8);
+  --footer-border: rgba(16, 185, 129, 0.35);
+  --footer-link: rgba(236, 253, 245, 0.85);
+  --footer-link-hover: #ffffff;
+  --footer-link-underline: rgba(209, 250, 229, 0.6);
+  --footer-badge-bg: rgba(15, 118, 110, 0.55);
+  --footer-badge-border: rgba(45, 212, 191, 0.4);
 }

@@ -237,12 +237,13 @@ body {
 
 /* Footer theme variables */
 :root {
-  --footer-bg: ;
-  --footer-fg: ;
-  --footer-muted: ;
-  --footer-border: ;
-  --footer-link: ;
-  --footer-link-hover: ;
-  --footer-badge-bg: ;
-  --footer-badge-border: ;
+  --footer-bg: linear-gradient(135deg, #7e22ce, #312e81);
+  --footer-fg: #fdf4ff;
+  --footer-muted: rgba(233, 213, 255, 0.8);
+  --footer-border: rgba(196, 181, 253, 0.4);
+  --footer-link: rgba(237, 233, 254, 0.85);
+  --footer-link-hover: #ffffff;
+  --footer-link-underline: rgba(237, 233, 254, 0.55);
+  --footer-badge-bg: rgba(76, 29, 149, 0.55);
+  --footer-badge-border: rgba(196, 181, 253, 0.4);
 }

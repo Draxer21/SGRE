@@ -3,7 +3,11 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from municipal_backend.api_views import DashboardOverviewAPIView
+from municipal_backend.api_views import (
+    DashboardOverviewAPIView,
+    SessionLogoutAPIView,
+    SessionStatusAPIView,
+)
 
 urlpatterns = [
     path("", RedirectView.as_view(pattern_name="cuentas:panel", permanent=False)),
@@ -16,6 +20,8 @@ urlpatterns = [
         DashboardOverviewAPIView.as_view(),
         name="dashboard-overview",
     ),
+    path("api/session/status/", SessionStatusAPIView.as_view(), name="session-status"),
+    path("api/session/logout/", SessionLogoutAPIView.as_view(), name="session-logout"),
     path("api/", include("municipal_backend.api_router")),
 
     path("cuentas/", include("cuentas.urls")),

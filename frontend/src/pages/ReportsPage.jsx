@@ -1,8 +1,10 @@
 import { useAsync } from "../hooks/useAsync.js";
+import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { listReportes } from "../services/reportsService.js";
 
 function ReportsPage() {
   const { data, error, loading, refetch } = useAsync(listReportes, []);
+  useBackendStyles("reportes");
 
   return (
     <section className="card">
