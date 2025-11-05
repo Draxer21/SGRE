@@ -160,13 +160,14 @@ li strong {
 .sgre-footer {
   background: var(--footer-bg, #1f1b2b);
   color: var(--footer-fg, #e9e7ef);
-  margin-top: 32px;
+  margin-top: 0;
 }
 
 .sgre-footer__wrap {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 48px 20px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 48px clamp(24px, 8vw, 96px);
   display: grid;
   gap: 32px;
 }
