@@ -1,66 +1,54 @@
-import StatusPill from "../components/StatusPill.jsx";
-import { useAsync } from "../hooks/useAsync.js";
+import { Link } from "react-router-dom";
+
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
-import { listEventos } from "../services/eventsService.js";
 
 function EventsPage() {
-  const { data, error, loading, refetch } = useAsync(listEventos, []);
   useBackendStyles("eventos");
 
   return (
-    <section className="card">
-      <header>
-        <h2 className="card__title">Eventos institucionales</h2>
-        <p>Listado de actividades registradas en el sistema.</p>
+    <>
+      <header className="app-header">
+        <div>
+          <h1 className="app-title">Gestion de Eventos</h1>
+          <p className="app-subtitle">Planifica actividades y coordina recursos.</p>
+        </div>
+        <div className="grid" style={{ gap: "12px", gridAutoFlow: "column" }}>
+          <Link className="btn btn--primary" to="/eventos/nuevo">
+            Nuevo evento
+          </Link>
+          <Link className="btn btn--ghost" to="/eventos/lista">
+            Gestionar
+          </Link>
+        </div>
       </header>
 
-      {loading && (
-        <div className="empty-state">
-          <span className="loader" aria-label="Cargando" />
-        </div>
-      )}
+      <main className="grid grid--two-columns">
+        <section className="surface">
+          <h2 className="section-title">Proximo paso</h2>
+          <article className="card">
+            <div className="card__header">
+              <h3 className="card__title">Crea tu primer evento</h3>
+            </div>
+            <p className="card__meta">Define titulo, fecha, hora, lugar y estado.</p>
+            <Link className="link" to="/eventos/nuevo">
+              Comenzar ahora
+            </Link>
+          </article>
+        </section>
 
-      {error && (
-        <div className="empty-state">
-          <p>Error al cargar eventos: {error.message}</p>
-          <button type="button" onClick={refetch}>
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {Array.isArray(data) && data.length > 0 ? (
-        <div style={{ overflowX: "auto" }}>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Titulo</th>
-                <th>Fecha</th>
-                <th>Hora</th>
-                <th>Lugar</th>
-                <th>Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((evento) => (
-                <tr key={evento.id}>
-                  <td>{evento.titulo}</td>
-                  <td>{evento.fecha}</td>
-                  <td>{evento.hora}</td>
-                  <td>{evento.lugar}</td>
-                  <td>
-                    <StatusPill label={evento.estado_display ?? evento.estado} />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        !loading &&
-        !error && <p className="empty-state">Aun no hay eventos registrados.</p>
-      )}
-    </section>
+        <section className="surface">
+          <h2 className="section-title">Accesos rapidos</h2>
+          <div className="grid">
+            <Link className="link" to="/eventos/lista">
+              Ver todos los eventos
+            </Link>
+            <Link className="link" to="/reportes">
+              Ir a Reportes
+            </Link>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }
 

@@ -1,9 +1,17 @@
 import apiClient from "./apiClient";
+import { normalizeListResponse } from "./listUtils";
 
 export async function listReservas(params = {}) {
   const response = await apiClient.get("reservas/", { params });
-  const payload = response.data;
-  return Array.isArray(payload) ? payload : payload?.results ?? [];
+  return normalizeListResponse(response.data);
+}
+
+export async function retrieveReserva(id) {
+  if (!id) {
+    throw new Error("ID de reserva requerido.");
+  }
+  const response = await apiClient.get(`reservas/${id}/`);
+  return response.data;
 }
 
 export async function createReserva(payload) {

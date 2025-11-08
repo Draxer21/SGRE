@@ -1,9 +1,17 @@
 import apiClient from "./apiClient";
+import { normalizeListResponse } from "./listUtils";
 
 export async function listReportes(params = {}) {
   const response = await apiClient.get("reportes/", { params });
-  const payload = response.data;
-  return Array.isArray(payload) ? payload : payload?.results ?? [];
+  return normalizeListResponse(response.data);
+}
+
+export async function retrieveReporte(id) {
+  if (!id) {
+    throw new Error("ID de reporte requerido.");
+  }
+  const response = await apiClient.get(`reportes/${id}/`);
+  return response.data;
 }
 
 export async function createReporte(payload) {

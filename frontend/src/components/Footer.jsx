@@ -1,5 +1,39 @@
-function Footer() {
+const DEFAULT_SECTIONS = [
+  {
+    title: "Panorama",
+    ariaLabel: "General",
+    items: [
+      { label: "Reportes", href: "/reportes/" },
+      { label: "Eventos", href: "/eventos/" },
+      { label: "Reservas", href: "/reservas/" },
+      { label: "Notificaciones", href: "/notificaciones/" },
+    ],
+  },
+  {
+    title: "Recursos",
+    ariaLabel: "Recursos",
+    items: [
+      { label: "Documentacion API", href: "/api/docs/" },
+      { label: "ReDoc", href: "/api/redoc/" },
+      { label: "Administracion", href: "/admin/" },
+      { label: "Politicas y terminos", href: "#" },
+    ],
+  },
+  {
+    title: "Comunidad",
+    ariaLabel: "Comunidad",
+    items: [
+      { label: "Transparencia", href: "#" },
+      { label: "Blog", href: "#" },
+      { label: "Contacto", href: "#" },
+      { label: "Soporte", href: "#" },
+    ],
+  },
+];
+
+function Footer({ sections = DEFAULT_SECTIONS }) {
   const currentYear = new Date().getFullYear();
+  const linkSections = Array.isArray(sections) ? sections : DEFAULT_SECTIONS;
 
   return (
     <footer className="sgre-footer" role="contentinfo">
@@ -15,81 +49,24 @@ function Footer() {
             </p>
           </div>
           <div className="sgre-footer__cols">
-            <nav className="sgre-footer__col" aria-label="General">
-              <h3 className="sgre-footer__title">Panorama</h3>
-              <ul className="sgre-footer__list">
-                <li>
-                  <a className="sgre-footer__link" href="/reportes/">
-                    Reportes
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="/eventos/">
-                    Eventos
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="/reservas/">
-                    Reservas
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="/notificaciones/">
-                    Notificaciones
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <nav className="sgre-footer__col" aria-label="Recursos">
-              <h3 className="sgre-footer__title">Recursos</h3>
-              <ul className="sgre-footer__list">
-                <li>
-                  <a className="sgre-footer__link" href="/api/docs/">
-                    Documentacion API
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="/api/redoc/">
-                    ReDoc
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="/admin/">
-                    Administracion
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="#">
-                    Politicas y terminos
-                  </a>
-                </li>
-              </ul>
-            </nav>
-            <nav className="sgre-footer__col" aria-label="Comunidad">
-              <h3 className="sgre-footer__title">Comunidad</h3>
-              <ul className="sgre-footer__list">
-                <li>
-                  <a className="sgre-footer__link" href="#">
-                    Transparencia
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="#">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="#">
-                    Contacto
-                  </a>
-                </li>
-                <li>
-                  <a className="sgre-footer__link" href="#">
-                    Soporte
-                  </a>
-                </li>
-              </ul>
-            </nav>
+            {linkSections.map((section) => (
+              <nav
+                key={section.title}
+                className="sgre-footer__col"
+                aria-label={section.ariaLabel ?? section.title}
+              >
+                <h3 className="sgre-footer__title">{section.title}</h3>
+                <ul className="sgre-footer__list">
+                  {section.items?.map((item) => (
+                    <li key={item.href ?? item.label}>
+                      <a className="sgre-footer__link" href={item.href}>
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
           </div>
         </div>
         <div className="sgre-footer__bottom">

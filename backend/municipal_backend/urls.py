@@ -5,6 +5,8 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 
 from municipal_backend.api_views import (
     DashboardOverviewAPIView,
+    FrontendManifestAPIView,
+    SessionLoginAPIView,
     SessionLogoutAPIView,
     SessionStatusAPIView,
 )
@@ -20,6 +22,12 @@ urlpatterns = [
         DashboardOverviewAPIView.as_view(),
         name="dashboard-overview",
     ),
+    path(
+        "api/frontend/manifest/",
+        FrontendManifestAPIView.as_view(),
+        name="frontend-manifest",
+    ),
+    path("api/session/login/", SessionLoginAPIView.as_view(), name="session-login"),
     path("api/session/status/", SessionStatusAPIView.as_view(), name="session-status"),
     path("api/session/logout/", SessionLogoutAPIView.as_view(), name="session-logout"),
     path("api/", include("municipal_backend.api_router")),

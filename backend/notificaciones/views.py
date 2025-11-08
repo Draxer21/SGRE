@@ -54,4 +54,28 @@ def nueva(request):
 
 
 def historial(request):
-    return HttpResponse("Historial completo de notificaciones disponible próximamente.")
+    registros = [
+        {
+            "titulo": "Aviso de mantencion",
+            "canal": "Correo",
+            "fecha": datetime(2025, 5, 28, 10, 5),
+            "estado": "Enviado",
+        },
+        {
+            "titulo": "Recordatorio de reunion",
+            "canal": "Push",
+            "fecha": datetime(2025, 5, 27, 16, 40),
+            "estado": "Programado",
+        },
+        {
+            "titulo": "Alerta de clima",
+            "canal": "SMS",
+            "fecha": datetime(2025, 5, 26, 8, 0),
+            "estado": "Enviado",
+        },
+    ]
+    return render(
+        request,
+        "notificaciones/historial.html",
+        {"registros": registros},
+    )

@@ -1,55 +1,56 @@
-import { useAsync } from "../hooks/useAsync.js";
+import { Link } from "react-router-dom";
+
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
-import { listReportes } from "../services/reportsService.js";
 
 function ReportsPage() {
-  const { data, error, loading, refetch } = useAsync(listReportes, []);
   useBackendStyles("reportes");
 
   return (
-    <section className="card">
-      <header>
-        <h2 className="card__title">Reportes administrativos</h2>
-        <p>Publicaciones e informes generados por las unidades.</p>
+    <>
+      <header className="app-header">
+        <div>
+          <h1 className="app-title">Reportes e Indicadores</h1>
+          <p className="app-subtitle">Monitorea desempeno y publica informes.</p>
+        </div>
+        <div className="grid" style={{ gap: "12px", gridAutoFlow: "column" }}>
+          <Link className="btn btn--primary" to="/reportes/nuevo">
+            Nuevo reporte
+          </Link>
+          <Link className="btn btn--ghost" to="/reportes/lista">
+            Gestionar
+          </Link>
+        </div>
       </header>
 
-      {loading && (
-        <div className="empty-state">
-          <span className="loader" aria-label="Cargando" />
-        </div>
-      )}
+      <main className="grid grid--two-columns">
+        <section className="surface">
+          <h2 className="section-title">Comienza aqui</h2>
+          <article className="card">
+            <div className="card__header">
+              <h3 className="card__title">Crear un informe</h3>
+            </div>
+            <p className="card__meta">
+              Titulo, fecha, descripcion y estado de publicacion.
+            </p>
+            <Link className="link" to="/reportes/nuevo">
+              Crear ahora
+            </Link>
+          </article>
+        </section>
 
-      {error && (
-        <div className="empty-state">
-          <p>Error al cargar reportes: {error.message}</p>
-          <button type="button" onClick={refetch}>
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {Array.isArray(data) && data.length > 0 ? (
-        <div className="card-grid">
-          {data.map((reporte) => (
-            <article key={reporte.id} className="card">
-              <header>
-                <h3 className="card__title">{reporte.titulo}</h3>
-                <span className="tag">
-                  {new Date(`${reporte.fecha}T00:00:00`).toLocaleDateString("es-CL")}
-                </span>
-              </header>
-              <p>{reporte.descripcion}</p>
-              <p>
-                Estado: <strong>{reporte.publicado ? "Publicado" : "Borrador"}</strong>
-              </p>
-            </article>
-          ))}
-        </div>
-      ) : (
-        !loading &&
-        !error && <p className="empty-state">Aun no hay reportes registrados.</p>
-      )}
-    </section>
+        <section className="surface">
+          <h2 className="section-title">Enlaces utiles</h2>
+          <div className="grid">
+            <a className="link" href="/api/docs/">
+              Documentacion API
+            </a>
+            <a className="link" href="/api/redoc/">
+              ReDoc
+            </a>
+          </div>
+        </section>
+      </main>
+    </>
   );
 }
 

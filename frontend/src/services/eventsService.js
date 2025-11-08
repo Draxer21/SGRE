@@ -1,9 +1,17 @@
 import apiClient from "./apiClient";
+import { normalizeListResponse } from "./listUtils";
 
 export async function listEventos(params = {}) {
   const response = await apiClient.get("eventos/", { params });
-  const payload = response.data;
-  return Array.isArray(payload) ? payload : payload?.results ?? [];
+  return normalizeListResponse(response.data);
+}
+
+export async function retrieveEvento(id) {
+  if (!id) {
+    throw new Error("ID de evento requerido.");
+  }
+  const response = await apiClient.get(`eventos/${id}/`);
+  return response.data;
 }
 
 export async function createEvento(payload) {

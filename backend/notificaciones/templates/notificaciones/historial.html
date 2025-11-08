@@ -1,0 +1,39 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notificaciones | Historial</title>
+  <link rel="stylesheet" href="{% static 'css/notificaciones.css' %}">
+</head>
+<body>
+  {% include 'includes/layout_open.html' %}
+  <div class="app-shell">
+    <div class="surface" style="margin:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h2 class="section-title" style="margin:0;">Historial de notificaciones</h2>
+        <a class="btn btn--ghost" href="{% url 'notificaciones:panel' %}">Volver al panel</a>
+      </div>
+
+      <div class="grid" style="margin-top:16px;">
+        {% for registro in registros %}
+          <article class="card">
+            <div class="card__header">
+              <h3 class="card__title">{{ registro.titulo }}</h3>
+              <span class="badge">{{ registro.estado }}</span>
+            </div>
+            <p class="card__meta">
+              {{ registro.fecha|date:'d/m/Y H:i' }} • Canal: {{ registro.canal }}
+            </p>
+          </article>
+        {% empty %}
+          <div class="empty-state">Aun no hay registros disponibles.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% include 'includes/footer.html' %}
+  {% include 'includes/layout_close.html' %}
+</body>
+</html>
