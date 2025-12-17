@@ -408,6 +408,57 @@ li strong {
   animation: spin 0.8s linear infinite;
 }
 
+/* Table styles */
+.table-wrapper {
+  overflow-x: auto;
+  margin-top: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e7ed;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  font-size: 0.9rem;
+}
+
+.data-table thead {
+  background-color: #f5f7fb;
+  border-bottom: 2px solid #cbd5e1;
+}
+
+.data-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #1f2933;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.data-table th.sortable:hover {
+  background-color: #e0e7ed;
+}
+
+.data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e0e7ed;
+  color: #52606d;
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.data-table--striped tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.data-table--hoverable tbody tr:hover {
+  background-color: #f0f4f8;
+}
+
 .app-shell--react {
   min-height: 100vh;
   padding: 0 !important;

@@ -14,7 +14,7 @@ const FALLBACK_MANIFEST = {
     title: "SGRE",
     subtitle: "Gestion Municipal",
     header: {
-      heading: "Municipalidad de ejemplo",
+      heading: "Municipalidad ",
       intro: "Sistema de Gestion de Reservas y Eventos.",
     },
   },

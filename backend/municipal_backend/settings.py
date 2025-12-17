@@ -14,6 +14,11 @@ from pathlib import Path
 import os
 
 
+def env_bool(name: str, default: bool = False) -> bool:
+    """Small helper to cast env vars to bool."""
+    return os.getenv(name, str(default)).lower() in {"1", "true", "yes", "on"}
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -22,12 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-4_!+d0g2ju%v$xt11=t=l12!de-1b3bs@yi&%ok@_1(sk0qxkr'
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-insecure-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env_bool("DEBUG", False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h] or []
 
 
 # Application definition
@@ -99,6 +104,10 @@ DATABASES = {
         "PASSWORD": os.getenv("DB_PASSWORD", "municipal_pass"),
         "HOST": os.getenv("DB_HOST", "127.0.0.1"),
         "PORT": os.getenv("DB_PORT", "5432"),
+        "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "0")),
+        "OPTIONS": {
+            "sslmode": os.getenv("DB_SSLMODE", "prefer"),  # usa "require" en producción
+        },
     }
 }
 
@@ -145,6 +154,10 @@ if FRONTEND_DIST_DIR.exists():
 else:
     STATICFILES_DIRS = []
 
+# Media (uploads locales)
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -166,7 +179,39 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": int(os.getenv("API_PAGE_SIZE", 10)),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": os.getenv("API_THROTTLE_ANON", "100/min"),
+        "user": os.getenv("API_THROTTLE_USER", "1000/min"),
+    },
 }
+
+# Email: consola por defecto (útil en dev). Sobrescribir con variables SMTP cuando se tengan.
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@municipio.local")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+
+# Seguridad HTTP (ajusta a True en producción con HTTPS)
+SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", False)
+SESSION_COOKIE_SECURE = env_bool("SESSION_COOKIE_SECURE", False)
+CSRF_COOKIE_SECURE = env_bool("CSRF_COOKIE_SECURE", False)
+SECURE_HSTS_SECONDS = int(os.getenv("SECURE_HSTS_SECONDS", "0"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", False)
+SECURE_HSTS_PRELOAD = env_bool("SECURE_HSTS_PRELOAD", False)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+X_FRAME_OPTIONS = "DENY"
 
 CORS_ALLOWED_ORIGINS = [
     os.getenv("FRONTEND_ORIGIN", "http://localhost:5173"),

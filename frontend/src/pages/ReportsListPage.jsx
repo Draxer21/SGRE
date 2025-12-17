@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 import PaginationControls from "../components/PaginationControls.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useAsync } from "../hooks/useAsync.js";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useDebounce } from "../hooks/useDebounce.js";
@@ -12,13 +13,25 @@ const PUBLICADO_OPTIONS = [
   { value: "true", label: "Publicado" },
   { value: "false", label: "Borrador" },
 ];
+
+const CATEGORY_OPTIONS = [
+  { value: "", label: "Todas las categorias" },
+  { value: "eventos", label: "Eventos" },
+  { value: "reservas", label: "Reservas" },
+  { value: "notificaciones", label: "Notificaciones" },
+  { value: "indicadores", label: "Indicadores" },
+  { value: "financiero", label: "Financiero" },
+  { value: "otros", label: "Otros" },
+];
 const PAGE_SIZE = 10;
 
 function ReportsListPage() {
+  const { canEdit } = useAuth();
   const [filters, setFilters] = useState({
     page: 1,
     search: "",
     publicado: "",
+    categoria: "",
   });
   const debouncedSearch = useDebounce(filters.search, 400);
   const queryParams = useMemo(
@@ -27,8 +40,9 @@ function ReportsListPage() {
       page_size: PAGE_SIZE,
       search: debouncedSearch || undefined,
       publicado: filters.publicado || undefined,
+      categoria: filters.categoria || undefined,
     }),
-    [filters.page, debouncedSearch, filters.publicado],
+    [filters.page, debouncedSearch, filters.publicado, filters.categoria],
   );
 
   const { data, error, loading, refetch } = useAsync(
@@ -55,9 +69,11 @@ function ReportsListPage() {
             Consulta informes registrados, edita o publica novedades.
           </p>
         </div>
-        <Link className="btn btn--primary" to="/reportes/nuevo">
-          Nuevo reporte
-        </Link>
+        {canEdit() && (
+          <Link className="btn btn--primary" to="/reportes/nuevo">
+            Nuevo reporte
+          </Link>
+        )}
       </div>
 
       <div
@@ -83,6 +99,18 @@ function ReportsListPage() {
           }
         >
           {PUBLICADO_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <select
+          value={filters.categoria}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, categoria: event.target.value, page: 1 }))
+          }
+        >
+          {CATEGORY_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -118,6 +146,13 @@ function ReportsListPage() {
               <p className="card__meta">
                 {new Date(`${reporte.fecha}T00:00:00`).toLocaleDateString("es-CL")}
               </p>
+              {Array.isArray(reporte.categorias) && reporte.categorias.length > 0 && (
+                <div className="grid" style={{ gridAutoFlow: "column", gap: "6px", flexWrap: "wrap" }}>
+                  {reporte.categorias.map((cat) => (
+                    <span key={cat} className="badge">{cat}</span>
+                  ))}
+                </div>
+              )}
               <div
                 className="grid"
                 style={{
@@ -129,12 +164,16 @@ function ReportsListPage() {
                 <Link className="link" to={`/reportes/${reporte.id}`}>
                   Ver detalle
                 </Link>
-                <Link className="link" to={`/reportes/${reporte.id}/editar`}>
-                  Editar
-                </Link>
-                <Link className="link" to={`/reportes/${reporte.id}/eliminar`}>
-                  Eliminar
-                </Link>
+                {canEdit() && (
+                  <>
+                    <Link className="link" to={`/reportes/${reporte.id}/editar`}>
+                      Editar
+                    </Link>
+                    <Link className="link" to={`/reportes/${reporte.id}/eliminar`}>
+                      Eliminar
+                    </Link>
+                  </>
+                )}
               </div>
             </article>
           ))}

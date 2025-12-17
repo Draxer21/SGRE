@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import {
   deleteCuenta,
@@ -10,7 +11,15 @@ import {
 function AccountDeletePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   useBackendStyles("cuentas");
+
+  // Redirect if user doesn't have admin permissions
+  useEffect(() => {
+    if (!isAdmin()) {
+      navigate("/cuentas");
+    }
+  }, [isAdmin, navigate]);
 
   const [cuenta, setCuenta] = useState(null);
   const [error, setError] = useState(null);

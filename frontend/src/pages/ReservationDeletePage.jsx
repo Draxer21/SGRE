@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import {
   deleteReserva,
@@ -10,7 +11,15 @@ import {
 function ReservationDeletePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   useBackendStyles("reservas");
+
+  // Redirect if user doesn't have edit permissions
+  useEffect(() => {
+    if (!canEdit()) {
+      navigate("/reservas");
+    }
+  }, [canEdit, navigate]);
 
   const [reserva, setReserva] = useState(null);
   const [error, setError] = useState(null);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import {
   deleteEvento,
@@ -10,7 +11,15 @@ import {
 function EventDeletePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   useBackendStyles("eventos");
+
+  // Redirect if user doesn't have edit permissions
+  useEffect(() => {
+    if (!canEdit()) {
+      navigate("/eventos");
+    }
+  }, [canEdit, navigate]);
 
   const [evento, setEvento] = useState(null);
   const [error, setError] = useState(null);

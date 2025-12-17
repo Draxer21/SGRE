@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import PaginationControls from "../components/PaginationControls.jsx";
+import Table from "../components/Table.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useAsync } from "../hooks/useAsync.js";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useDebounce } from "../hooks/useDebounce.js";
@@ -21,6 +23,8 @@ const ACTIVO_OPTIONS = [
 const PAGE_SIZE = 10;
 
 function AccountsListPage() {
+  const navigate = useNavigate();
+  const { isAdmin, canEdit } = useAuth();
   const [filters, setFilters] = useState({
     page: 1,
     search: "",
@@ -45,6 +49,65 @@ function AccountsListPage() {
   );
   useBackendStyles("cuentas");
 
+  const columns = useMemo(
+    () => [
+      {
+        key: "nombre",
+        label: "Nombre",
+        sortable: true,
+      },
+      {
+        key: "email",
+        label: "Email",
+        sortable: true,
+      },
+      {
+        key: "rol_display",
+        label: "Rol",
+        sortable: true,
+        render: (value, row) => (
+          <span className="badge">{value ?? row.rol}</span>
+        ),
+      },
+      {
+        key: "activo",
+        label: "Estado",
+        sortable: true,
+        align: "center",
+        render: (value) => (
+          <span style={{ color: value ? "#059669" : "#dc2626" }}>
+            {value ? "Activa" : "Inactiva"}
+          </span>
+        ),
+      },
+      {
+        key: "acciones",
+        label: "Acciones",
+        align: "center",
+        render: (_, row) => (
+          <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+            <Link className="link" to={`/cuentas/${row.id}`}>
+              Ver
+            </Link>
+            {canEdit() && (
+              <>
+                <Link className="link" to={`/cuentas/${row.id}/editar`}>
+                  Editar
+                </Link>
+                {isAdmin() && (
+                  <Link className="link" to={`/cuentas/${row.id}/eliminar`}>
+                    Eliminar
+                  </Link>
+                )}
+              </>
+            )}
+          </div>
+        ),
+      },
+    ],
+    [canEdit, isAdmin]
+  );
+
   return (
     <section className="surface" style={{ margin: "0 auto", maxWidth: "960px" }}>
       <div
@@ -63,9 +126,20 @@ function AccountsListPage() {
             Gestiona usuarios habilitados y sus roles.
           </p>
         </div>
-        <Link className="btn btn--primary" to="/cuentas/nueva">
-          Nueva cuenta
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => window.open('/api/cuentas/export/', '_blank')}
+          >
+            Exportar CSV
+          </button>
+          {isAdmin() && (
+            <Link className="btn btn--primary" to="/cuentas/nueva">
+              Nueva cuenta
+            </Link>
+          )}
+        </div>
       </div>
 
       <div
@@ -125,45 +199,15 @@ function AccountsListPage() {
         </div>
       )}
 
-      {Array.isArray(data?.results) && data.results.length > 0 ? (
-        <div className="grid" style={{ marginTop: "16px", gap: "16px" }}>
-          {data.results.map((cuenta) => (
-            <article key={cuenta.id} className="card">
-              <div className="card__header">
-                <h3 className="card__title">{cuenta.nombre}</h3>
-                <span className="badge">{cuenta.rol_display ?? cuenta.rol}</span>
-              </div>
-              <p className="card__meta">{cuenta.email}</p>
-              <p className="card__meta">Estado: {cuenta.activo ? "Activa" : "Inactiva"}</p>
-              <div
-                className="grid"
-                style={{
-                  gridAutoFlow: "column",
-                  justifyContent: "start",
-                  gap: "12px",
-                }}
-              >
-                <Link className="link" to={`/cuentas/${cuenta.id}`}>
-                  Ver detalle
-                </Link>
-                <Link className="link" to={`/cuentas/${cuenta.id}/editar`}>
-                  Editar
-                </Link>
-                <Link className="link" to={`/cuentas/${cuenta.id}/eliminar`}>
-                  Eliminar
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        !loading &&
-        !error && (
-          <div className="empty-state" style={{ marginTop: "16px" }}>
-            Aun no hay cuentas registradas.
-          </div>
-        )
+      {!loading && !error && (
+        <Table
+          data={data?.results ?? []}
+          columns={columns}
+          onRowClick={(row) => navigate(`/cuentas/${row.id}`)}
+          emptyMessage="Aun no hay cuentas registradas."
+        />
       )}
+      
       <PaginationControls
         page={filters.page}
         pageSize={PAGE_SIZE}

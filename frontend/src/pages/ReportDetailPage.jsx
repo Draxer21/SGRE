@@ -46,6 +46,11 @@ function ReportDetailPage() {
       <p className="card__meta">
         Estado: {data.publicado ? "Publicado" : "Borrador"}
       </p>
+      {Array.isArray(data.categorias) && data.categorias.length > 0 && (
+        <p className="card__meta">
+          Categorias: {data.categorias.join(", ")}
+        </p>
+      )}
       {data.descripcion && (
         <p className="card__meta" style={{ marginTop: "12px" }}>
           {data.descripcion}

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useSerializerSchema } from "../hooks/useSerializerSchema.js";
 import {
@@ -20,22 +21,35 @@ const EMPTY_VALUES = {
   fecha: "",
   hora: "",
   lugar: "",
+  direccion: "",
   estado: ESTADO_OPTIONS[0].value,
   descripcion: "",
+  modo_aforo: "general",
+  cupo_total: 0,
 };
 
 function EventFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   useBackendStyles("eventos");
   const { schema: eventoSchema } = useSerializerSchema("eventos");
+
+  // Redirect if user doesn't have edit permissions
+  useEffect(() => {
+    if (!canEdit()) {
+      navigate("/eventos");
+    }
+  }, [canEdit, navigate]);
 
   const [formValues, setFormValues] = useState(EMPTY_VALUES);
   const [formErrors, setFormErrors] = useState({});
   const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(isEdit);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewImage, setPreviewImage] = useState("");
 
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
 
@@ -55,9 +69,13 @@ function EventFormPage() {
           fecha: data.fecha ?? "",
           hora: data.hora ?? "",
           lugar: data.lugar ?? "",
+          direccion: data.direccion ?? "",
           estado: data.estado ?? ESTADO_OPTIONS[0].value,
           descripcion: data.descripcion ?? "",
+          modo_aforo: data.modo_aforo ?? "general",
+          cupo_total: data.cupo_total ?? 0,
         });
+        setPreviewImage(data.imagen_portada ?? "");
         setFeedback(null);
       })
       .catch((error) => {
@@ -91,6 +109,24 @@ function EventFormPage() {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      setSelectedFile(null);
+      setPreviewImage("");
+      return;
+    }
+    setSelectedFile(file);
+    setPreviewImage(URL.createObjectURL(file));
+    if (formErrors.imagen_portada) {
+      setFormErrors((prev) => {
+        const next = { ...prev };
+        delete next.imagen_portada;
+        return next;
+      });
+    }
+  };
+
   const getFieldRule = (fieldName, prop, fallback) =>
     eventoSchema?.[fieldName]?.[prop] ?? fallback;
 
@@ -111,12 +147,26 @@ function EventFormPage() {
     if (!formValues.lugar.trim() || formValues.lugar.trim().length < lugarMin) {
       nextErrors.lugar = "Ingresa un lugar valido (minimo 3 caracteres).";
     }
+    const direccionMin = getFieldRule("direccion", "min_length", 5);
+    if (!formValues.direccion.trim() || formValues.direccion.trim().length < direccionMin) {
+      nextErrors.direccion = "Ingresa una direccion valida (minimo 5 caracteres).";
+    }
     if (!ESTADO_OPTIONS.some((option) => option.value === formValues.estado)) {
       nextErrors.estado = "Selecciona un estado valido.";
     }
     const descripcionMax = getFieldRule("descripcion", "max_length", 2000);
     if (formValues.descripcion && formValues.descripcion.length > descripcionMax) {
       nextErrors.descripcion = "Maximo 2000 caracteres.";
+    }
+    const cupo = Number(formValues.cupo_total);
+    if (formValues.modo_aforo === "general") {
+      if (!Number.isInteger(cupo) || cupo <= 0) {
+        nextErrors.cupo_total = "Ingresa un cupo total mayor a 0.";
+      }
+    } else {
+      if (!Number.isInteger(cupo) || cupo < 0) {
+        nextErrors.cupo_total = "Usa un numero valido (0 o mayor).";
+      }
     }
     return nextErrors;
   };
@@ -135,13 +185,19 @@ function EventFormPage() {
 
     setSubmitting(true);
     try {
+      const payload = { ...formValues };
+      if (selectedFile) {
+        payload.imagen_portada = selectedFile;
+      }
       if (isEdit) {
-        await updateEvento(id, formValues);
+        await updateEvento(id, payload);
         setFeedback({ type: "success", message: "Evento actualizado." });
       } else {
-        await createEvento(formValues);
+        await createEvento(payload);
         setFeedback({ type: "success", message: "Evento creado correctamente." });
         setFormValues(EMPTY_VALUES);
+        setSelectedFile(null);
+        setPreviewImage("");
       }
       setFormErrors({});
       setTimeout(() => {
@@ -306,6 +362,33 @@ function EventFormPage() {
           </div>
 
           <div className="form-field">
+            <label htmlFor="direccion">
+              Direccion <span aria-hidden="true">*</span>
+            </label>
+            <p className="card__meta">
+              {eventoSchema?.direccion?.help_text ??
+                "Calle y numero (dato atomico, sin embeds)."}
+            </p>
+            <input
+              id="direccion"
+              name="direccion"
+              type="text"
+              autoComplete="street-address"
+              value={formValues.direccion}
+              onChange={handleChange}
+              required
+              disabled={submitting}
+              minLength={getFieldRule("direccion", "min_length", 5)}
+              maxLength={getFieldRule("direccion", "max_length", 200)}
+            />
+            {formErrors.direccion && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.direccion}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
             <label htmlFor="estado">
               Estado <span aria-hidden="true">*</span>
             </label>
@@ -331,6 +414,52 @@ function EventFormPage() {
           </div>
 
           <div className="form-field">
+            <label htmlFor="modo_aforo">
+              Modo de aforo <span aria-hidden="true">*</span>
+            </label>
+            <p className="card__meta">General (un cupo total) o por zonas.</p>
+            <select
+              id="modo_aforo"
+              name="modo_aforo"
+              value={formValues.modo_aforo}
+              onChange={handleChange}
+              required
+              disabled={submitting}
+            >
+              <option value="general">General</option>
+              <option value="zonas">Zonas</option>
+            </select>
+            {formErrors.modo_aforo && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.modo_aforo}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="cupo_total">Cupo total</label>
+            <p className="card__meta">
+              {formValues.modo_aforo === "general"
+                ? "Aforo total disponible."
+                : "Referencia general; el reparto real se hace por zonas."}
+            </p>
+            <input
+              id="cupo_total"
+              name="cupo_total"
+              type="number"
+              min={formValues.modo_aforo === "general" ? 1 : 0}
+              value={formValues.cupo_total}
+              onChange={handleChange}
+              disabled={submitting}
+            />
+            {formErrors.cupo_total && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.cupo_total}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
             <label htmlFor="descripcion">Descripcion</label>
             <textarea
               id="descripcion"
@@ -350,6 +479,33 @@ function EventFormPage() {
             {formErrors.descripcion && (
               <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
                 {formErrors.descripcion}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="imagen_portada">Imagen del lugar</label>
+            <input
+              id="imagen_portada"
+              name="imagen_portada"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleFileChange}
+              disabled={submitting}
+            />
+            <p className="card__meta">Opcional. JPG/PNG/WebP, max 5 MB.</p>
+            {previewImage && (
+              <div style={{ marginTop: "8px" }}>
+                <img
+                  src={previewImage}
+                  alt="Vista previa del lugar"
+                  style={{ maxWidth: "100%", borderRadius: "8px" }}
+                />
+              </div>
+            )}
+            {formErrors.imagen_portada && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.imagen_portada}
               </span>
             )}
           </div>

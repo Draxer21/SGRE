@@ -45,9 +45,23 @@ function EventDetailPage() {
         {new Date(`${data.fecha}T00:00:00`).toLocaleDateString("es-CL")} •{" "}
         {data.hora?.slice(0, 5)} • {data.lugar}
       </p>
+      {data.direccion && <p className="card__meta">Direccion: {data.direccion}</p>}
+      <p className="card__meta">
+        Aforo: {data.modo_aforo === "zonas" ? "Por zonas" : "General"}
+        {typeof data.cupo_total === "number" ? ` • Cupo total: ${data.cupo_total}` : ""}
+      </p>
       <p className="card__meta">
         Estado: <StatusPill label={data.estado_display ?? data.estado} />
       </p>
+      {data.imagen_portada && (
+        <div style={{ marginTop: "12px" }}>
+          <img
+            src={data.imagen_portada}
+            alt={`Imagen del lugar de ${data.titulo}`}
+            style={{ maxWidth: "100%", borderRadius: "8px" }}
+          />
+        </div>
+      )}
       {data.descripcion && (
         <p className="card__meta" style={{ marginTop: "12px" }}>
           {data.descripcion}

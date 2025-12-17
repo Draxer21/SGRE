@@ -3,6 +3,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
+from .email_utils import send_test_email
 
 def panel(request):
     alertas = [
@@ -78,4 +79,16 @@ def historial(request):
         request,
         "notificaciones/historial.html",
         {"registros": registros},
+    )
+
+
+def prueba_correo(request):
+    if request.method == "POST":
+        destinatarios = request.POST.get("to") or request.GET.get("to")
+        to_list = [d.strip() for d in destinatarios.split(",") if d.strip()] if destinatarios else []
+        enviados = send_test_email(to_list)
+        return HttpResponse(f"Correos enviados: {enviados}")
+    return HttpResponse(
+        "Usa POST con 'to' (coma separada) para enviar un correo de prueba.",
+        content_type="text/plain",
     )

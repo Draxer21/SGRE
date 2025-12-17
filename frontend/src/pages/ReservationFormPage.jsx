@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
+import Header from "../components/Header.jsx";
 import {
   createReserva,
   retrieveReserva,
   updateReserva,
 } from "../services/reservationsService.js";
+import { listEventos } from "../services/eventsService.js";
 import { useSerializerSchema } from "../hooks/useSerializerSchema.js";
 
 const ESTADO_OPTIONS = [
@@ -16,11 +19,11 @@ const ESTADO_OPTIONS = [
 ];
 
 const EMPTY_VALUES = {
-  codigo: "",
   espacio: "",
-  fecha: "",
-  hora: "",
   solicitante: "",
+  evento: "",
+  zona: "",
+  cupos_solicitados: 1,
   estado: ESTADO_OPTIONS[0].value,
   notas: "",
 };
@@ -29,16 +32,29 @@ function ReservationFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   useBackendStyles("reservas");
   const { schema: reservaSchema } = useSerializerSchema("reservas");
+
+  // Redirect if user doesn't have edit permissions
+  useEffect(() => {
+    if (!canEdit()) {
+      navigate("/reservas");
+    }
+  }, [canEdit, navigate]);
 
   const [formValues, setFormValues] = useState(EMPTY_VALUES);
   const [formErrors, setFormErrors] = useState({});
   const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [loadingInitial, setLoadingInitial] = useState(isEdit);
-
-  const today = useMemo(() => new Date().toISOString().split("T")[0], []);
+  const [eventOptions, setEventOptions] = useState([]);
+  const [loadingEventos, setLoadingEventos] = useState(true);
+  const selectedEvent = useMemo(() => {
+    const idNum = Number(formValues.evento);
+    if (!idNum) return null;
+    return eventOptions.find((ev) => ev.id === idNum) || null;
+  }, [formValues.evento, eventOptions]);
 
   useEffect(() => {
     if (!isEdit) {
@@ -52,11 +68,11 @@ function ReservationFormPage() {
           return;
         }
         setFormValues({
-          codigo: data.codigo ?? "",
           espacio: data.espacio ?? "",
-          fecha: data.fecha ?? "",
-          hora: data.hora ?? "",
           solicitante: data.solicitante ?? "",
+          evento: data.evento ?? "",
+          zona: data.zona ?? "",
+          cupos_solicitados: data.cupos_solicitados ?? 1,
           estado: data.estado ?? ESTADO_OPTIONS[0].value,
           notas: data.notas ?? "",
         });
@@ -82,9 +98,35 @@ function ReservationFormPage() {
     };
   }, [id, isEdit]);
 
+  // Cargar eventos para seleccionar
+  useEffect(() => {
+    let active = true;
+    setLoadingEventos(true);
+    listEventos({ page_size: 200, ordering: "-fecha" })
+      .then((resp) => {
+        if (!active) return;
+        setEventOptions(resp?.results ?? []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setEventOptions([]);
+      })
+      .finally(() => {
+        if (active) setLoadingEventos(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormValues((prev) => ({ ...prev, [name]: value }));
+    setFormValues((prev) => {
+      if (name === "evento") {
+        return { ...prev, evento: value, zona: "" };
+      }
+      return { ...prev, [name]: value };
+    });
     if (formErrors[name]) {
       setFormErrors((prev) => {
         const next = { ...prev };
@@ -99,33 +141,12 @@ function ReservationFormPage() {
 
   const validate = () => {
     const nextErrors = {};
-    const codigoMin = getFieldRule("codigo", "min_length", 4);
-    const codigoMax = getFieldRule("codigo", "max_length", 32);
-    const codigoRegex = /^[a-z0-9-]+$/;
-    if (
-      formValues.codigo.length < codigoMin ||
-      formValues.codigo.length > codigoMax ||
-      !codigoRegex.test(formValues.codigo)
-    ) {
-      nextErrors.codigo =
-        reservaSchema?.codigo?.help_text ??
-        "Usa minusculas, numeros o guiones (min. 4 caracteres).";
-    }
     const espacioMin = getFieldRule("espacio", "min_length", 3);
     if (
       !formValues.espacio.trim() ||
       formValues.espacio.trim().length < espacioMin
     ) {
       nextErrors.espacio = "Ingresa un espacio valido (minimo 3 caracteres).";
-    }
-    if (!formValues.fecha) {
-      nextErrors.fecha = "La fecha es obligatoria.";
-    } else if (!isEdit && formValues.fecha < today) {
-      nextErrors.fecha = "Usa una fecha de hoy o futura.";
-    }
-    const horaRegex = /^([01]\d|2[0-3]):[0-5]\d$/;
-    if (!horaRegex.test(formValues.hora)) {
-      nextErrors.hora = "Usa el formato 24h HH:MM.";
     }
     const solicitanteMin = getFieldRule("solicitante", "min_length", 3);
     if (
@@ -134,6 +155,18 @@ function ReservationFormPage() {
     ) {
       nextErrors.solicitante =
         "Ingresa el area/responsable (minimo 3 caracteres).";
+    }
+    if (!formValues.evento || !Number.isInteger(Number(formValues.evento))) {
+      nextErrors.evento = "Selecciona un evento valido.";
+    }
+    if (selectedEvent?.modo_aforo === "zonas") {
+      if (!formValues.zona) {
+        nextErrors.zona = "Selecciona una zona.";
+      }
+    }
+    const cupos = Number(formValues.cupos_solicitados);
+    if (!Number.isInteger(cupos) || cupos <= 0) {
+      nextErrors.cupos_solicitados = "Indica una cantidad de cupos mayor a 0.";
     }
     if (!ESTADO_OPTIONS.some((option) => option.value === formValues.estado)) {
       nextErrors.estado = "Selecciona un estado valido.";
@@ -159,11 +192,19 @@ function ReservationFormPage() {
 
     setSubmitting(true);
     try {
+      const payload = { ...formValues };
+      if (payload.evento === "") {
+        payload.evento = null;
+      }
+      if (payload.zona === "") {
+        payload.zona = null;
+      }
+      payload.cupos_solicitados = Number(payload.cupos_solicitados) || 0;
       if (isEdit) {
-        await updateReserva(id, formValues);
+        await updateReserva(id, payload);
         setFeedback({ type: "success", message: "Reserva actualizada." });
       } else {
-        await createReserva(formValues);
+        await createReserva(payload);
         setFeedback({ type: "success", message: "Reserva creada correctamente." });
         setFormValues(EMPTY_VALUES);
       }
@@ -206,16 +247,11 @@ function ReservationFormPage() {
 
   return (
     <section className="surface" style={{ margin: "0 auto", maxWidth: "720px" }}>
-      <header className="app-header" style={{ marginBottom: "18px" }}>
-        <div>
-          <h2 className="section-title" style={{ marginBottom: "8px" }}>
-            {formTitle}
-          </h2>
-          <p className="app-subtitle">
-            Completa los datos del espacio, horario y responsable.
-          </p>
-        </div>
-      </header>
+      <Header
+        title={formTitle}
+        subtitle="Selecciona el evento, cupos y responsable. La fecha/hora se toman del evento."
+        style={{ marginBottom: "18px" }}
+      />
 
       {feedback && (
         <div
@@ -244,34 +280,6 @@ function ReservationFormPage() {
       ) : (
         <form className="grid" style={{ gap: "14px" }} onSubmit={handleSubmit} noValidate>
           <div className="form-field">
-            <label htmlFor="codigo">
-              Codigo <span aria-hidden="true">*</span>
-            </label>
-            <p className="card__meta">
-              {reservaSchema?.codigo?.help_text ??
-                "Solo minusculas, numeros y guiones (ej.: res-2025-001)."}
-            </p>
-            <input
-              id="codigo"
-              name="codigo"
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              value={formValues.codigo}
-              onChange={handleChange}
-              required
-              disabled={submitting}
-              minLength={getFieldRule("codigo", "min_length", 4)}
-              maxLength={getFieldRule("codigo", "max_length", 32)}
-            />
-            {formErrors.codigo && (
-              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.codigo}
-              </span>
-            )}
-          </div>
-
-          <div className="form-field">
             <label htmlFor="espacio">
               Espacio <span aria-hidden="true">*</span>
             </label>
@@ -298,44 +306,100 @@ function ReservationFormPage() {
           </div>
 
           <div className="form-field">
-            <label htmlFor="fecha">
-              Fecha <span aria-hidden="true">*</span>
-            </label>
-            <p className="card__meta">Formato AAAA-MM-DD. Hoy o futuro.</p>
-            <input
-              id="fecha"
-              name="fecha"
-              type="date"
-              value={formValues.fecha}
+            <label htmlFor="evento">Evento asociado</label>
+            <p className="card__meta">
+              Selecciona el evento. La fecha y hora se toman automaticamente del evento.
+            </p>
+            <select
+              id="evento"
+              name="evento"
+              value={formValues.evento ?? ""}
               onChange={handleChange}
-              min={isEdit ? undefined : today}
+              disabled={submitting || loadingEventos}
               required
-              disabled={submitting}
-            />
-            {formErrors.fecha && (
+            >
+              <option value="">Selecciona un evento</option>
+              {eventOptions.map((ev) => (
+                <option key={ev.id} value={ev.id}>
+                  {ev.titulo} — {ev.fecha}
+                </option>
+              ))}
+            </select>
+            {loadingEventos && (
+              <p className="card__meta">Cargando eventos...</p>
+            )}
+            {formErrors.evento && (
               <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.fecha}
+                {formErrors.evento}
               </span>
             )}
           </div>
 
+          {selectedEvent && (
+            <div className="form-field">
+              <p className="card__meta" style={{ margin: 0 }}>
+                Fecha/Hora del evento: {selectedEvent.fecha} {selectedEvent.hora?.slice(0,5)}
+              </p>
+              <p className="card__meta" style={{ margin: 0 }}>
+                Modo de aforo: {selectedEvent.modo_aforo === "zonas" ? "Zonas" : "General"}
+              </p>
+              {selectedEvent.modo_aforo === "general" && (
+                <p className="card__meta" style={{ margin: 0 }}>
+                  Cupo total: {selectedEvent.cupo_total}
+                </p>
+              )}
+            </div>
+          )}
+
+          {selectedEvent?.modo_aforo === "zonas" && (
+            <div className="form-field">
+              <label htmlFor="zona">
+                Zona <span aria-hidden="true">*</span>
+              </label>
+              <p className="card__meta">Selecciona la zona del evento.</p>
+              <select
+                id="zona"
+                name="zona"
+                value={formValues.zona ?? ""}
+                onChange={handleChange}
+                disabled={submitting}
+                required
+              >
+                <option value="">Elige una zona</option>
+                {(selectedEvent.zonas ?? []).map((z) => (
+                  <option key={z.id} value={z.id}>
+                    {z.nombre} — cupo {z.cupo_total}
+                  </option>
+                ))}
+              </select>
+              {formErrors.zona && (
+                <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                  {formErrors.zona}
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="form-field">
-            <label htmlFor="hora">
-              Hora <span aria-hidden="true">*</span>
+            <label htmlFor="cupos_solicitados">
+              Cupos solicitados <span aria-hidden="true">*</span>
             </label>
-            <p className="card__meta">Formato 24h HH:MM.</p>
+            <p className="card__meta">
+              Indica cuántos cupos ocupará esta reserva.
+            </p>
             <input
-              id="hora"
-              name="hora"
-              type="time"
-              value={formValues.hora}
+              id="cupos_solicitados"
+              name="cupos_solicitados"
+              type="number"
+              min={1}
+              value={formValues.cupos_solicitados}
               onChange={handleChange}
               required
               disabled={submitting}
             />
-            {formErrors.hora && (
+            {formErrors.cupos_solicitados && (
               <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.hora}
+                {formErrors.cupos_solicitados}
               </span>
             )}
           </div>

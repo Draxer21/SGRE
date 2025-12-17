@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
+import Header from "../components/Header.jsx";
 import { useSerializerSchema } from "../hooks/useSerializerSchema.js";
 import {
   createReporte,
@@ -13,6 +15,7 @@ const EMPTY_VALUES = {
   titulo: "",
   fecha: "",
   publicado: false,
+  categorias: [],
   descripcion: "",
 };
 
@@ -20,8 +23,25 @@ function ReportFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
   useBackendStyles("reportes");
   const { schema: reporteSchema } = useSerializerSchema("reportes");
+
+  const CATEGORY_OPTIONS = [
+    { value: "eventos", label: "Eventos" },
+    { value: "reservas", label: "Reservas" },
+    { value: "notificaciones", label: "Notificaciones" },
+    { value: "indicadores", label: "Indicadores" },
+    { value: "financiero", label: "Financiero" },
+    { value: "otros", label: "Otros" },
+  ];
+
+  // Redirect if user doesn't have edit permissions
+  useEffect(() => {
+    if (!canEdit()) {
+      navigate("/reportes");
+    }
+  }, [canEdit, navigate]);
 
   const [formValues, setFormValues] = useState(EMPTY_VALUES);
   const [formErrors, setFormErrors] = useState({});
@@ -46,6 +66,7 @@ function ReportFormPage() {
           titulo: data.titulo ?? "",
           fecha: data.fecha ?? "",
           publicado: Boolean(data.publicado),
+          categorias: Array.isArray(data.categorias) ? data.categorias : [],
           descripcion: data.descripcion ?? "",
         });
         setFeedback(null);
@@ -71,10 +92,15 @@ function ReportFormPage() {
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
-    setFormValues((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    if (name === "categorias") {
+      const selected = Array.from(event.target.selectedOptions).map((opt) => opt.value);
+      setFormValues((prev) => ({ ...prev, categorias: selected }));
+    } else {
+      setFormValues((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
     if (formErrors[name]) {
       setFormErrors((prev) => {
         const next = { ...prev };
@@ -95,6 +121,9 @@ function ReportFormPage() {
     }
     if (!formValues.fecha) {
       nextErrors.fecha = "La fecha es obligatoria.";
+    }
+    if (!formValues.categorias || formValues.categorias.length === 0) {
+      nextErrors.categorias = "Selecciona al menos una categoria.";
     }
     const descripcionMax = getFieldRule("descripcion", "max_length", 2000);
     if (formValues.descripcion && formValues.descripcion.length > descripcionMax) {
@@ -162,17 +191,17 @@ function ReportFormPage() {
   };
 
   const formTitle = isEdit ? "Editar reporte" : "Nuevo reporte";
+  const formSubtitle = isEdit
+    ? "Actualiza los detalles del reporte para mantener la informacion al dia."
+    : "Completa la informacion para registrar un nuevo reporte institucional.";
 
   return (
     <section className="surface surface--form" style={{ margin: "0 auto", maxWidth: "720px" }}>
-      <header className="form-header">
-        <h2 className="form-title">{formTitle}</h2>
-        <p className="form-subtitle">
-          {isEdit
-            ? "Actualiza los detalles del reporte para mantener la informacion al dia."
-            : "Completa la informacion para registrar un nuevo reporte institucional."}
-        </p>
-      </header>
+      <Header
+        title={formTitle}
+        subtitle={formSubtitle}
+        className="form-header"
+      />
 
       {feedback && (
         <div
@@ -243,6 +272,33 @@ function ReportFormPage() {
             {formErrors.fecha && (
               <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
                 {formErrors.fecha}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="categorias">
+              Categorias <span aria-hidden="true">*</span>
+            </label>
+            <p className="card__meta">Selecciona una o varias.</p>
+            <select
+              id="categorias"
+              name="categorias"
+              multiple
+              value={formValues.categorias}
+              onChange={handleChange}
+              disabled={submitting}
+              style={{ minHeight: "120px" }}
+            >
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {formErrors.categorias && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.categorias}
               </span>
             )}
           </div>

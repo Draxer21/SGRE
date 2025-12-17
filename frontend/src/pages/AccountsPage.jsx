@@ -1,26 +1,30 @@
 import { Link } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 
 function AccountsPage() {
   useBackendStyles("cuentas");
+  const { isAdmin } = useAuth();
 
   return (
     <>
       <header className="app-header">
         <div>
           <h1 className="app-title">Centro de Cuentas</h1>
-          <p className="app-subtitle">Administra usuarios, roles y accesos.</p>
+          <p className="app-subtitle">{isAdmin() ? "Administra usuarios, roles y accesos." : "Consulta información de cuentas."}</p>
         </div>
         <div
           className="grid"
           style={{ gap: "12px", gridAutoFlow: "column", flexWrap: "wrap" }}
         >
-          <Link className="btn btn--primary" to="/cuentas/nueva">
-            Nueva cuenta
-          </Link>
+          {isAdmin() && (
+            <Link className="btn btn--primary" to="/cuentas/nueva">
+              Nueva cuenta
+            </Link>
+          )}
           <Link className="btn btn--ghost" to="/cuentas/lista">
-            Gestionar
+            {isAdmin() ? "Gestionar" : "Ver lista"}
           </Link>
           <Link className="btn btn--ghost" to="/acceso">
             Iniciar sesion
@@ -53,12 +57,11 @@ function AccountsPage() {
             <Link className="link" to="/cuentas/lista">
               Ver listado de cuentas
             </Link>
-            <Link className="link" to="/cuentas/nueva">
-              Crear nueva cuenta
-            </Link>
-            <a className="link" href="/admin/">
-              Ir a Administracion
-            </a>
+            {isAdmin() && (
+              <Link className="link" to="/cuentas/nueva">
+                Crear nueva cuenta
+              </Link>
+            )}
           </div>
         </section>
       </main>

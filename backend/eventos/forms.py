@@ -8,7 +8,7 @@ from .models import Evento
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
-        fields = ["titulo", "fecha", "hora", "lugar", "estado", "descripcion"]
+        fields = ["titulo", "fecha", "hora", "lugar", "direccion", "estado", "descripcion"]
         labels = {
             "titulo": "Título",
             "fecha": "Fecha",
@@ -22,6 +22,7 @@ class EventoForm(forms.ModelForm):
             "fecha": "Formato AAAA-MM-DD. Debe ser hoy o futuro.",
             "hora": "Formato 24h HH:MM (ej.: 14:30).",
             "lugar": "Nombre del espacio o dirección completa.",
+            "direccion": "Calle y número (dato atómico).",
             "estado": "Etapa actual del evento.",
             "descripcion": "Información adicional para participantes y equipo.",
         }
@@ -49,6 +50,12 @@ class EventoForm(forms.ModelForm):
                 "maxlength": 200,
                 "required": True,
             }),
+            "direccion": forms.TextInput(attrs={
+                "autocomplete": "street-address",
+                "minlength": 5,
+                "maxlength": 200,
+                "required": False,
+            }),
             "estado": forms.Select(attrs={"required": True}),
             "descripcion": forms.Textarea(attrs={
                 "rows": 5,
@@ -72,9 +79,12 @@ class EventoForm(forms.ModelForm):
                 "required": "El lugar es obligatorio.",
                 "max_length": "Máximo 200 caracteres.",
             },
+            "direccion": {
+                "max_length": "Máximo 200 caracteres.",
+            },
         }
 
-    field_order = ["titulo", "fecha", "hora", "lugar", "estado", "descripcion"]
+    field_order = ["titulo", "fecha", "hora", "lugar", "direccion", "estado", "descripcion"]
 
     def clean_titulo(self):
         titulo = (self.cleaned_data.get("titulo") or "").strip()

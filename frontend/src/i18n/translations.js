@@ -7,7 +7,7 @@ export const translations = {
     brand: {
       title: "SGRE",
       subtitle: "Gestión Municipal",
-      headerTitle: "Municipalidad de ejemplo",
+      headerTitle: "Municipalidad",
       headerIntro: "Sistema de Gestión de Reservas y Eventos.",
     },
     auth: {

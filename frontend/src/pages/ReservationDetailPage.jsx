@@ -47,6 +47,11 @@ function ReservationDetailPage() {
         {new Date(`${data.fecha}T00:00:00`).toLocaleDateString("es-CL")} •{" "}
         {data.hora?.slice(0, 5)}
       </p>
+      {data.evento_titulo && (
+        <p className="card__meta">
+          Evento: <Link to={`/eventos/${data.evento}`}>{data.evento_titulo}</Link>
+        </p>
+      )}
       <p className="card__meta">Solicitante: {data.solicitante}</p>
       <p className="card__meta">
         Estado: <StatusPill label={data.estado_display ?? data.estado} />

@@ -1,10 +1,14 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import PaginationControls from "../components/PaginationControls.jsx";
+import Table from "../components/Table.jsx";
+import StatusPill from "../components/StatusPill.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useAsync } from "../hooks/useAsync.js";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useDebounce } from "../hooks/useDebounce.js";
+import { listEventos } from "../services/eventsService.js";
 import { listReservas } from "../services/reservationsService.js";
 
 const ESTADO_OPTIONS = [
@@ -16,10 +20,13 @@ const ESTADO_OPTIONS = [
 const PAGE_SIZE = 10;
 
 function ReservationsListPage() {
+  const navigate = useNavigate();
+  const { canEdit } = useAuth();
   const [filters, setFilters] = useState({
     page: 1,
     search: "",
     estado: "",
+    evento: "",
   });
   const debouncedSearch = useDebounce(filters.search, 400);
   const queryParams = useMemo(
@@ -28,15 +35,104 @@ function ReservationsListPage() {
       page_size: PAGE_SIZE,
       search: debouncedSearch || undefined,
       estado: filters.estado || undefined,
+      evento: filters.evento || undefined,
     }),
-    [filters.page, debouncedSearch, filters.estado],
+    [filters.page, debouncedSearch, filters.estado, filters.evento],
   );
 
   const { data, error, loading, refetch } = useAsync(
     () => listReservas(queryParams),
     [queryParams],
   );
+  const { data: eventosData } = useAsync(() => listEventos({ page_size: 200, ordering: "-fecha" }), []);
   useBackendStyles("reservas");
+
+  const columns = useMemo(
+    () => [
+      {
+        key: "codigo",
+        label: "Código",
+        sortable: true,
+      },
+      {
+        key: "evento_titulo",
+        label: "Evento",
+        sortable: true,
+        render: (value, row) =>
+          value ? (
+            <Link to={`/eventos/${row.evento}`}>{value}</Link>
+          ) : (
+            <span style={{ color: "#94a3b8" }}>Sin evento</span>
+          ),
+      },
+      {
+        key: "espacio",
+        label: "Espacio",
+        sortable: true,
+      },
+      {
+        key: "fecha",
+        label: "Fecha",
+        sortable: true,
+        render: (value) => new Date(`${value}T00:00:00`).toLocaleDateString("es-CL"),
+      },
+      {
+        key: "hora",
+        label: "Hora",
+        sortable: true,
+        render: (value) => value?.slice(0, 5),
+      },
+      {
+        key: "zona",
+        label: "Zona",
+        render: (_, row) => row.zona_nombre || <span style={{ color: "#94a3b8" }}>N/A</span>,
+      },
+      {
+        key: "cupos_solicitados",
+        label: "Cupos",
+        sortable: true,
+      },
+      {
+        key: "solicitante",
+        label: "Solicitante",
+        sortable: true,
+      },
+      {
+        key: "estado",
+        label: "Estado",
+        sortable: true,
+        align: "center",
+        render: (value, row) => (
+          <StatusPill status={value}>
+            {row.estado_display ?? value}
+          </StatusPill>
+        ),
+      },
+      {
+        key: "acciones",
+        label: "Acciones",
+        align: "center",
+        render: (_, row) => (
+          <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+            <Link className="link" to={`/reservas/${row.id}`}>
+              Ver
+            </Link>
+            {canEdit() && (
+              <>
+                <Link className="link" to={`/reservas/${row.id}/editar`}>
+                  Editar
+                </Link>
+                <Link className="link" to={`/reservas/${row.id}/eliminar`}>
+                  Eliminar
+                </Link>
+              </>
+            )}
+          </div>
+        ),
+      },
+    ],
+    [canEdit]
+  );
 
   return (
     <section className="surface" style={{ margin: "0 auto", maxWidth: "960px" }}>
@@ -56,9 +152,18 @@ function ReservationsListPage() {
             Gestiona solicitudes, actualiza estados o revisa detalles.
           </p>
         </div>
-        <Link className="btn btn--primary" to="/reservas/nueva">
-          Nueva reserva
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => window.open('/api/reservas/export/', '_blank')}
+          >
+            Exportar CSV
+          </button>
+          <Link className="btn btn--primary" to="/reservas/nueva">
+            Nueva reserva
+          </Link>
+        </div>
       </div>
 
       <div
@@ -89,6 +194,19 @@ function ReservationsListPage() {
             </option>
           ))}
         </select>
+        <select
+          value={filters.evento}
+          onChange={(event) =>
+            setFilters((prev) => ({ ...prev, evento: event.target.value, page: 1 }))
+          }
+        >
+          <option value="">Todos los eventos</option>
+          {(eventosData?.results ?? []).map((ev) => (
+            <option key={ev.id} value={ev.id}>
+              {ev.titulo} — {ev.fecha}
+            </option>
+          ))}
+        </select>
       </div>
 
       {loading && (
@@ -106,53 +224,15 @@ function ReservationsListPage() {
         </div>
       )}
 
-      {Array.isArray(data?.results) && data.results.length > 0 ? (
-        <div className="grid" style={{ marginTop: "16px", gap: "16px" }}>
-          {data.results.map((reserva) => (
-            <article key={reserva.id} className="card">
-              <div className="card__header">
-                <h3 className="card__title">
-                  {reserva.codigo} — {reserva.espacio}
-                </h3>
-                <span className="tag">
-                  {reserva.estado_display ?? reserva.estado}
-                </span>
-              </div>
-              <p className="card__meta">
-                {new Date(`${reserva.fecha}T00:00:00`).toLocaleDateString("es-CL")} •{" "}
-                {reserva.hora?.slice(0, 5)}
-              </p>
-              <p className="card__meta">Solicitante: {reserva.solicitante}</p>
-              <div
-                className="grid"
-                style={{
-                  gridAutoFlow: "column",
-                  justifyContent: "start",
-                  gap: "12px",
-                  marginTop: "12px",
-                }}
-              >
-                <Link className="link" to={`/reservas/${reserva.id}`}>
-                  Ver detalle
-                </Link>
-                <Link className="link" to={`/reservas/${reserva.id}/editar`}>
-                  Editar
-                </Link>
-                <Link className="link" to={`/reservas/${reserva.id}/eliminar`}>
-                  Eliminar
-                </Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        !loading &&
-        !error && (
-          <div className="empty-state" style={{ marginTop: "16px" }}>
-            Aun no hay reservas registradas.
-          </div>
-        )
+      {!loading && !error && (
+        <Table
+          data={data?.results ?? []}
+          columns={columns}
+          onRowClick={(row) => navigate(`/reservas/${row.id}`)}
+          emptyMessage="Aun no hay reservas registradas."
+        />
       )}
+      
       <PaginationControls
         page={filters.page}
         pageSize={PAGE_SIZE}

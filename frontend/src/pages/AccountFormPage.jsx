@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useSerializerSchema } from "../hooks/useSerializerSchema.js";
 import {
@@ -26,8 +27,16 @@ function AccountFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   useBackendStyles("cuentas");
   const { schema: cuentaSchema } = useSerializerSchema("cuentas");
+
+  // Redirect if user doesn't have admin permissions
+  useEffect(() => {
+    if (!isAdmin()) {
+      navigate("/cuentas");
+    }
+  }, [isAdmin, navigate]);
 
   const [formValues, setFormValues] = useState(EMPTY_VALUES);
   const [formErrors, setFormErrors] = useState({});

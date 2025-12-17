@@ -31,146 +31,41 @@ function App() {
   return (
     <Routes>
       <Route path="/acceso" element={<LoginPage />} />
-      <Route path="/" element={<Layout />}>
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Layout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
-        <Route
-          path="cuentas"
-          element={
-            <ProtectedRoute>
-              <AccountsPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="cuentas/lista"
-          element={
-            <ProtectedRoute>
-              <AccountsListPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="cuentas/nueva"
-          element={
-            <ProtectedRoute>
-              <AccountFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="cuentas/:id"
-          element={
-            <ProtectedRoute>
-              <AccountDetailPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="cuentas/:id/editar"
-          element={
-            <ProtectedRoute>
-              <AccountFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="cuentas/:id/eliminar"
-          element={
-            <ProtectedRoute>
-              <AccountDeletePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="cuentas" element={<AccountsPage />} />
+        <Route path="cuentas/lista" element={<AccountsListPage />} />
+        <Route path="cuentas/nueva" element={<AccountFormPage />} />
+        <Route path="cuentas/:id" element={<AccountDetailPage />} />
+        <Route path="cuentas/:id/editar" element={<AccountFormPage />} />
+        <Route path="cuentas/:id/eliminar" element={<AccountDeletePage />} />
         <Route path="eventos" element={<EventsPage />} />
         <Route path="eventos/lista" element={<EventsListPage />} />
-        <Route
-          path="eventos/nuevo"
-          element={
-            <ProtectedRoute>
-              <EventFormPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="eventos/nuevo" element={<EventFormPage />} />
         <Route path="eventos/:id" element={<EventDetailPage />} />
-        <Route
-          path="eventos/:id/editar"
-          element={
-            <ProtectedRoute>
-              <EventFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="eventos/:id/eliminar"
-          element={
-            <ProtectedRoute>
-              <EventDeletePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="eventos/:id/editar" element={<EventFormPage />} />
+        <Route path="eventos/:id/eliminar" element={<EventDeletePage />} />
         <Route path="reservas" element={<ReservationsPage />} />
         <Route path="reservas/lista" element={<ReservationsListPage />} />
-        <Route
-          path="reservas/nueva"
-          element={
-            <ProtectedRoute>
-              <ReservationFormPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="reservas/nueva" element={<ReservationFormPage />} />
         <Route path="reservas/:id" element={<ReservationDetailPage />} />
-        <Route
-          path="reservas/:id/editar"
-          element={
-            <ProtectedRoute>
-              <ReservationFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="reservas/:id/eliminar"
-          element={
-            <ProtectedRoute>
-              <ReservationDeletePage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="reservas/:id/editar" element={<ReservationFormPage />} />
+        <Route path="reservas/:id/eliminar" element={<ReservationDeletePage />} />
         <Route path="reportes" element={<ReportsPage />} />
         <Route path="reportes/lista" element={<ReportsListPage />} />
-        <Route
-          path="reportes/nuevo"
-          element={
-            <ProtectedRoute>
-              <ReportFormPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="reportes/nuevo" element={<ReportFormPage />} />
         <Route path="reportes/:id" element={<ReportDetailPage />} />
-        <Route
-          path="reportes/:id/editar"
-          element={
-            <ProtectedRoute>
-              <ReportFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="reportes/:id/eliminar"
-          element={
-            <ProtectedRoute>
-              <ReportDeletePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="notificaciones"
-          element={
-            <ProtectedRoute>
-              <NotificationsPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="reportes/:id/editar" element={<ReportFormPage />} />
+        <Route path="reportes/:id/eliminar" element={<ReportDeletePage />} />
+        <Route path="notificaciones" element={<NotificationsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

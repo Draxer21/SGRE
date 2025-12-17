@@ -1,6 +1,22 @@
 import apiClient from "./apiClient";
 import { normalizeListResponse } from "./listUtils";
 
+function buildEventPayload(payload) {
+  const hasFile = payload?.imagen_portada instanceof File;
+  if (!hasFile) {
+    return { data: payload, isForm: false };
+  }
+
+  const formData = new FormData();
+  Object.entries(payload || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null) {
+      return;
+    }
+    formData.append(key, value);
+  });
+  return { data: formData, isForm: true };
+}
+
 export async function listEventos(params = {}) {
   const response = await apiClient.get("eventos/", { params });
   return normalizeListResponse(response.data);
@@ -15,12 +31,16 @@ export async function retrieveEvento(id) {
 }
 
 export async function createEvento(payload) {
-  const response = await apiClient.post("eventos/", payload);
+  const { data, isForm } = buildEventPayload(payload);
+  const config = isForm ? { headers: { "Content-Type": "multipart/form-data" } } : undefined;
+  const response = await apiClient.post("eventos/", data, config);
   return response.data;
 }
 
 export async function updateEvento(id, payload) {
-  const response = await apiClient.put(`eventos/${id}/`, payload);
+  const { data, isForm } = buildEventPayload(payload);
+  const config = isForm ? { headers: { "Content-Type": "multipart/form-data" } } : undefined;
+  const response = await apiClient.put(`eventos/${id}/`, data, config);
   return response.data;
 }
 

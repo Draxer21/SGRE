@@ -1,0 +1,221 @@
+[
+  {
+    "model": "cuentas.cuenta",
+    "pk": 1,
+    "fields": {
+      "nombre": "Ada Admin",
+      "email": "ada.admin@municipio.cl",
+      "rol": "admin",
+      "activo": true,
+      "creado": "2024-12-01T09:00:00Z",
+      "actualizado": "2024-12-01T09:00:00Z"
+    }
+  },
+  {
+    "model": "cuentas.cuenta",
+    "pk": 2,
+    "fields": {
+      "nombre": "Elena Editora",
+      "email": "elena.editor@municipio.cl",
+      "rol": "editor",
+      "activo": true,
+      "creado": "2024-12-01T09:05:00Z",
+      "actualizado": "2024-12-01T09:05:00Z"
+    }
+  },
+  {
+    "model": "cuentas.cuenta",
+    "pk": 3,
+    "fields": {
+      "nombre": "Carlos Consulta",
+      "email": "carlos.consulta@municipio.cl",
+      "rol": "consulta",
+      "activo": true,
+      "creado": "2024-12-01T09:10:00Z",
+      "actualizado": "2024-12-01T09:10:00Z"
+    }
+  },
+  {
+    "model": "eventos.evento",
+    "pk": 1,
+    "fields": {
+      "titulo": "Feria de Innovación Ciudadana",
+      "fecha": "2025-01-18",
+      "hora": "15:00:00",
+      "lugar": "Parque Tecnológico Municipal",
+      "direccion": "Av. Tecnológica 123, Ciudad",
+      "estado": "convocatoria",
+      "modo_aforo": "general",
+      "cupo_total": 500,
+      "descripcion": "Muestras de proyectos vecinales, talleres rápidos y charlas sobre herramientas digitales abiertas.",
+      "imagen_portada": "",
+      "creado": "2024-12-05T10:00:00Z",
+      "actualizado": "2024-12-05T10:00:00Z"
+    }
+  },
+  {
+    "model": "eventos.evento",
+    "pk": 2,
+    "fields": {
+      "titulo": "Jornada de Limpieza Costera",
+      "fecha": "2025-02-02",
+      "hora": "09:00:00",
+      "lugar": "Playa Bicentenario",
+      "direccion": "Av. Costanera 456, Ciudad",
+      "estado": "confirmado",
+      "modo_aforo": "zonas",
+      "cupo_total": 0,
+      "descripcion": "Voluntariado coordinado con organizaciones ambientales y colegios locales.",
+      "imagen_portada": "",
+      "creado": "2024-12-06T11:00:00Z",
+      "actualizado": "2024-12-06T11:00:00Z"
+    }
+  },
+  {
+    "model": "eventos.evento",
+    "pk": 3,
+    "fields": {
+      "titulo": "Sesión Extraordinaria de Presupuesto 2025",
+      "fecha": "2025-01-10",
+      "hora": "18:30:00",
+      "lugar": "Salón de Concejo",
+      "direccion": "Av. Central 789, Ciudad",
+      "estado": "borrador",
+      "modo_aforo": "general",
+      "cupo_total": 80,
+      "descripcion": "Discusión preliminar de prioridades de inversión barrial.",
+      "imagen_portada": "",
+      "creado": "2024-12-07T12:00:00Z",
+      "actualizado": "2024-12-07T12:00:00Z"
+    }
+  },
+  {
+    "model": "eventos.zonaevento",
+    "pk": 1,
+    "fields": {
+      "evento": 2,
+      "nombre": "Sector A",
+      "cupo_total": 120
+    }
+  },
+  {
+    "model": "eventos.zonaevento",
+    "pk": 2,
+    "fields": {
+      "evento": 2,
+      "nombre": "Sector B",
+      "cupo_total": 180
+    }
+  },
+  {
+    "model": "reservas.reserva",
+    "pk": 1,
+    "fields": {
+      "codigo": "auditorio-energia",
+      "espacio": "Auditorio Energía",
+      "fecha": "2025-01-18",
+      "hora": "14:00:00",
+      "solicitante": "Dirección de Innovación",
+      "evento": 1,
+      "zona": null,
+      "cupos_solicitados": 50,
+      "estado": "pendiente",
+      "notas": "Montaje de stands desde las 12:00.",
+      "creado": "2024-12-08T08:30:00Z",
+      "actualizado": "2024-12-08T08:30:00Z"
+    }
+  },
+  {
+    "model": "reservas.reserva",
+    "pk": 2,
+    "fields": {
+      "codigo": "plaza-bicentenario",
+      "espacio": "Plaza Bicentenario",
+      "fecha": "2025-02-02",
+      "hora": "07:30:00",
+      "solicitante": "Medio Ambiente",
+      "evento": 2,
+      "zona": 1,
+      "cupos_solicitados": 80,
+      "estado": "confirmada",
+      "notas": "Se requieren 4 puntos de agua y sonido básico.",
+      "creado": "2024-12-08T09:00:00Z",
+      "actualizado": "2024-12-08T09:00:00Z"
+    }
+  },
+  {
+    "model": "reservas.reserva",
+    "pk": 3,
+    "fields": {
+      "codigo": "sala-concejo-extra",
+      "espacio": "Sala de Concejo",
+      "fecha": "2025-01-10",
+      "hora": "17:00:00",
+      "solicitante": "Finanzas",
+      "evento": 3,
+      "zona": null,
+      "cupos_solicitados": 20,
+      "estado": "pendiente",
+      "notas": "Proyector 4K y conexión remota.",
+      "creado": "2024-12-08T09:30:00Z",
+      "actualizado": "2024-12-08T09:30:00Z"
+    }
+  },
+  {
+    "model": "reservas.reserva",
+    "pk": 4,
+    "fields": {
+      "codigo": "biblioteca-comunitaria",
+      "espacio": "Biblioteca Comunitaria",
+      "fecha": "2025-01-25",
+      "hora": "11:00:00",
+      "solicitante": "Cultura",
+      "evento": 1,
+      "zona": null,
+      "cupos_solicitados": 30,
+      "estado": "pendiente",
+      "notas": "Club de lectura abierto, requiere 30 sillas.",
+      "creado": "2024-12-08T10:00:00Z",
+      "actualizado": "2024-12-08T10:00:00Z"
+    }
+  },
+  {
+    "model": "reportes.reporte",
+    "pk": 1,
+    "fields": {
+      "titulo": "Resumen de eventos enero",
+      "descripcion": "Consolidado de asistencia estimada, estado de difusión y capacidad reservada por recinto.",
+      "fecha": "2025-01-31",
+      "publicado": true,
+      "categorias": ["eventos", "indicadores"],
+      "creado": "2024-12-09T08:00:00Z",
+      "actualizado": "2024-12-09T08:00:00Z"
+    }
+  },
+  {
+    "model": "reportes.reporte",
+    "pk": 2,
+    "fields": {
+      "titulo": "Reservas pendientes Q1",
+      "descripcion": "Pendientes por dependencia, con SLA y responsables para confirmación.",
+      "fecha": "2025-03-31",
+      "publicado": false,
+      "categorias": ["reservas", "financiero"],
+      "creado": "2024-12-09T08:30:00Z",
+      "actualizado": "2024-12-09T08:30:00Z"
+    }
+  },
+  {
+    "model": "reportes.reporte",
+    "pk": 3,
+    "fields": {
+      "titulo": "Alertas de difusión",
+      "descripcion": "Recordatorios automáticos de mailing y push por canal.",
+      "fecha": "2025-01-05",
+      "publicado": false,
+      "categorias": ["notificaciones", "otros"],
+      "creado": "2024-12-09T09:00:00Z",
+      "actualizado": "2024-12-09T09:00:00Z"
+    }
+  }
+]

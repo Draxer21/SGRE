@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import PaginationControls from "../components/PaginationControls.jsx";
 import StatusPill from "../components/StatusPill.jsx";
+import { useAuth } from "../contexts/AuthContext.jsx";
 import { useAsync } from "../hooks/useAsync.js";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
 import { useDebounce } from "../hooks/useDebounce.js";
@@ -17,6 +18,7 @@ const ESTADO_OPTIONS = [
 const PAGE_SIZE = 10;
 
 function EventsListPage() {
+  const { canEdit } = useAuth();
   const [filters, setFilters] = useState({
     page: 1,
     search: "",
@@ -57,9 +59,11 @@ function EventsListPage() {
             Revisa actividades registradas y coordina los proximos pasos.
           </p>
         </div>
-        <Link className="btn btn--primary" to="/eventos/nuevo">
-          Nuevo evento
-        </Link>
+        {canEdit() && (
+          <Link className="btn btn--primary" to="/eventos/nuevo">
+            Nuevo evento
+          </Link>
+        )}
       </div>
 
       <div
@@ -132,12 +136,16 @@ function EventsListPage() {
                 <Link className="link" to={`/eventos/${evento.id}`}>
                   Ver detalle
                 </Link>
-                <Link className="link" to={`/eventos/${evento.id}/editar`}>
-                  Editar
-                </Link>
-                <Link className="link" to={`/eventos/${evento.id}/eliminar`}>
-                  Eliminar
-                </Link>
+                {canEdit() && (
+                  <>
+                    <Link className="link" to={`/eventos/${evento.id}/editar`}>
+                      Editar
+                    </Link>
+                    <Link className="link" to={`/eventos/${evento.id}/eliminar`}>
+                      Eliminar
+                    </Link>
+                  </>
+                )}
               </div>
             </article>
           ))}

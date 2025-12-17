@@ -1,10 +1,11 @@
 from datetime import date
 
 from django.contrib.auth import authenticate, login, logout
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cuentas.permissions import get_user_role
 from eventos.models import Evento
 from reservas.models import Reserva
 from reportes.models import Reporte
@@ -64,14 +65,19 @@ class SessionStatusAPIView(APIView):
 
     def get(self, request):
         username = None
+        role = None
+        
         if request.user.is_authenticated:
             username = request.user.get_username()
+            role = get_user_role(request.user)
         else:
             username = request.session.get("usuario_actual")
+            
         return Response(
             {
                 "isAuthenticated": bool(username),
                 "username": username,
+                "role": role,
             }
         )
 
@@ -102,10 +108,13 @@ class SessionLoginAPIView(APIView):
         if not remember:
             request.session.set_expiry(0)
 
+        role = get_user_role(user)
+
         return Response(
             {
                 "detail": "Sesión iniciada.",
                 "username": user.get_username(),
+                "role": role,
             }
         )
 
@@ -130,7 +139,7 @@ class FrontendManifestAPIView(APIView):
                 "title": "SGRE",
                 "subtitle": "Gestion Municipal",
                 "header": {
-                    "heading": "Municipalidad de ejemplo",
+                    "heading": "Municipalidad",
                     "intro": "Sistema de Gestion de Reservas y Eventos.",
                 },
             },
