@@ -4,6 +4,7 @@ import {
   getSessionStatus,
   loginSession,
   logoutSession,
+  registerSession,
 } from "../services/sessionService.js";
 
 const AuthContext = createContext({
@@ -12,6 +13,7 @@ const AuthContext = createContext({
   loading: true,
   error: null,
   login: async () => {},
+  register: async () => {},
   logout: async () => {},
   refresh: async () => {},
   hasRole: () => false,
@@ -67,6 +69,27 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
+  const register = useCallback(async ({ nombre, usuario, password }) => {
+    setState((prev) => ({ ...prev, loading: true, error: null }));
+    try {
+      const response = await registerSession({ nombre, usuario, password });
+      setState({
+        user: response?.username ?? usuario,
+        role: response?.role ?? "consulta",
+        loading: false,
+        error: null,
+      });
+      return response;
+    } catch (error) {
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: error?.response?.data?.detail ?? "No fue posible completar el registro.",
+      }));
+      throw error;
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await logoutSession();
@@ -99,13 +122,14 @@ export function AuthProvider({ children }) {
       loading: state.loading,
       error: state.error,
       login,
+      register,
       logout,
       refresh,
       hasRole,
       canEdit,
       isAdmin,
     }),
-    [state, login, logout, refresh, hasRole, canEdit, isAdmin],
+    [state, login, register, logout, refresh, hasRole, canEdit, isAdmin],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -21,7 +21,7 @@ const PAGE_SIZE = 10;
 
 function ReservationsListPage() {
   const navigate = useNavigate();
-  const { canEdit } = useAuth();
+  const { user, canEdit } = useAuth();
   const [filters, setFilters] = useState({
     page: 1,
     search: "",
@@ -153,16 +153,20 @@ function ReservationsListPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            onClick={() => window.open('/api/reservas/export/', '_blank')}
-          >
-            Exportar CSV
-          </button>
-          <Link className="btn btn--primary" to="/reservas/nueva">
-            Nueva reserva
-          </Link>
+          {canEdit() && (
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => window.open('/api/reservas/export/', '_blank')}
+            >
+              Exportar CSV
+            </button>
+          )}
+          {user && (
+            <Link className="btn btn--primary" to="/reservas/nueva">
+              Nueva reserva
+            </Link>
+          )}
         </div>
       </div>
 

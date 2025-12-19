@@ -40,7 +40,8 @@ function AccountDetailPage() {
   return (
     <section className="surface" style={{ margin: "0 auto", maxWidth: "720px" }}>
       <h2 className="section-title">{data.nombre}</h2>
-      <p className="card__meta">{data.email}</p>
+      <p className="card__meta">Usuario: {data.usuario}</p>
+      {data.email && <p className="card__meta">{data.email}</p>}
       <p className="card__meta">Rol: {data.rol_display ?? data.rol}</p>
       <p className="card__meta">Estado: {data.activo ? "Activa" : "Inactiva"}</p>
       <div

@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 
 from cuentas.export_utils import export_to_csv
-from cuentas.permissions import IsEditorOrReadOnly
+from cuentas.permissions import IsAdminOrEditor
 from .models import Reporte
 
 
@@ -51,14 +51,14 @@ class ReporteViewSet(viewsets.ModelViewSet):
 
     queryset = Reporte.objects.all()
     serializer_class = ReporteSerializer
-    permission_classes = [IsAuthenticated, IsEditorOrReadOnly]
+    permission_classes = [IsAuthenticated, IsAdminOrEditor]
     filterset_class = ReporteFilter
     search_fields = ["titulo", "descripcion", "categorias"]
     ordering_fields = ["fecha", "creado"]
     ordering = ["-fecha", "-creado"]
     filter_backends = [DjangoFilterBackend, drf_filters.SearchFilter, drf_filters.OrderingFilter]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminOrEditor])
     def export(self, request):
         """Exporta los reportes filtrados a CSV."""
         queryset = self.filter_queryset(self.get_queryset())

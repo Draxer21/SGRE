@@ -1,8 +1,6 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, serializers, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-
 from cuentas.export_utils import export_to_csv
 from cuentas.permissions import IsEditorOrReadOnly
 from .models import Evento, ZonaEvento
@@ -44,7 +42,8 @@ class EventoViewSet(viewsets.ModelViewSet):
 
     queryset = Evento.objects.all()
     serializer_class = EventoSerializer
-    permission_classes = [IsAuthenticated, IsEditorOrReadOnly]
+    # Permite lectura pública; ediciones solo para editores/admins
+    permission_classes = [IsEditorOrReadOnly]
     filterset_fields = ["estado", "fecha", "hora"]
     search_fields = ["titulo", "lugar", "direccion", "descripcion"]
     ordering_fields = ["fecha", "hora", "creado"]

@@ -31,16 +31,18 @@ class LoginForm(forms.Form):
 class CuentaForm(forms.ModelForm):
     class Meta:
         model = Cuenta
-        fields = ["nombre", "email", "rol", "activo"]
+        fields = ["nombre", "usuario", "email", "rol", "activo"]
         labels = {
             "nombre": "Nombre",
+            "usuario": "Usuario",
             "email": "Email",
             "rol": "Rol",
             "activo": "Activo",
         }
         help_texts = {
             "nombre": "Entre 3 y 150 caracteres.",
-            "email": "Correo institucional válido.",
+            "usuario": "Nombre de usuario para iniciar sesión.",
+            "email": "Correo institucional válido (opcional).",
         }
         widgets = {
             "nombre": forms.TextInput(attrs={
@@ -49,10 +51,16 @@ class CuentaForm(forms.ModelForm):
                 "maxlength": 150,
                 "required": True,
             }),
+            "usuario": forms.TextInput(attrs={
+                "autocomplete": "username",
+                "minlength": 3,
+                "maxlength": 150,
+                "required": True,
+            }),
             "email": forms.EmailInput(attrs={
                 "autocomplete": "email",
                 "inputmode": "email",
-                "required": True,
+                "required": False,
             }),
             "rol": forms.Select(attrs={"required": True}),
             "activo": forms.CheckboxInput(),
@@ -63,8 +71,13 @@ class CuentaForm(forms.ModelForm):
                 "min_length": "Mínimo 3 caracteres.",
                 "max_length": "Máximo 150 caracteres.",
             },
+            "usuario": {
+                "required": "El usuario es obligatorio.",
+                "min_length": "Mínimo 3 caracteres.",
+                "max_length": "Máximo 150 caracteres.",
+                "unique": "Ya existe una cuenta con este usuario.",
+            },
             "email": {
-                "required": "El email es obligatorio.",
                 "invalid": "Formato de email inválido.",
                 "unique": "Ya existe una cuenta con este email.",
             },

@@ -57,6 +57,11 @@ function AccountsListPage() {
         sortable: true,
       },
       {
+        key: "usuario",
+        label: "Usuario",
+        sortable: true,
+      },
+      {
         key: "email",
         label: "Email",
         sortable: true,
@@ -127,13 +132,15 @@ function AccountsListPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          <button
-            type="button"
-            className="btn btn--ghost"
-            onClick={() => window.open('/api/cuentas/export/', '_blank')}
-          >
-            Exportar CSV
-          </button>
+          {isAdmin() && (
+            <button
+              type="button"
+              className="btn btn--ghost"
+              onClick={() => window.open('/api/cuentas/export/', '_blank')}
+            >
+              Exportar CSV
+            </button>
+          )}
           {isAdmin() && (
             <Link className="btn btn--primary" to="/cuentas/nueva">
               Nueva cuenta
@@ -152,7 +159,7 @@ function AccountsListPage() {
       >
         <input
           type="search"
-          placeholder="Buscar por nombre o email"
+          placeholder="Buscar por nombre, usuario o email"
           value={filters.search}
           onChange={(event) =>
             setFilters((prev) => ({ ...prev, search: event.target.value, page: 1 }))

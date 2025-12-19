@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 import { useAuth } from "../contexts/AuthContext.jsx";
 import { useBackendStyles } from "../hooks/useBackendStyles.js";
@@ -32,18 +32,24 @@ function ReservationFormPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  const { canEdit } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { canEdit, user } = useAuth();
   useBackendStyles("reservas");
   const { schema: reservaSchema } = useSerializerSchema("reservas");
 
+  const canManage = canEdit();
+
   // Redirect if user doesn't have edit permissions
   useEffect(() => {
-    if (!canEdit()) {
+    if (isEdit && !canEdit()) {
       navigate("/reservas");
     }
-  }, [canEdit, navigate]);
+  }, [canEdit, isEdit, navigate]);
 
-  const [formValues, setFormValues] = useState(EMPTY_VALUES);
+  const [formValues, setFormValues] = useState(() => ({
+    ...EMPTY_VALUES,
+    evento: searchParams.get("evento") || "",
+  }));
   const [formErrors, setFormErrors] = useState({});
   const [feedback, setFeedback] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -141,20 +147,22 @@ function ReservationFormPage() {
 
   const validate = () => {
     const nextErrors = {};
-    const espacioMin = getFieldRule("espacio", "min_length", 3);
-    if (
-      !formValues.espacio.trim() ||
-      formValues.espacio.trim().length < espacioMin
-    ) {
-      nextErrors.espacio = "Ingresa un espacio valido (minimo 3 caracteres).";
-    }
-    const solicitanteMin = getFieldRule("solicitante", "min_length", 3);
-    if (
-      !formValues.solicitante.trim() ||
-      formValues.solicitante.trim().length < solicitanteMin
-    ) {
-      nextErrors.solicitante =
-        "Ingresa el area/responsable (minimo 3 caracteres).";
+    if (canManage) {
+      const espacioMin = getFieldRule("espacio", "min_length", 3);
+      if (
+        !formValues.espacio.trim() ||
+        formValues.espacio.trim().length < espacioMin
+      ) {
+        nextErrors.espacio = "Ingresa un espacio valido (minimo 3 caracteres).";
+      }
+      const solicitanteMin = getFieldRule("solicitante", "min_length", 3);
+      if (
+        !formValues.solicitante.trim() ||
+        formValues.solicitante.trim().length < solicitanteMin
+      ) {
+        nextErrors.solicitante =
+          "Ingresa el area/responsable (minimo 3 caracteres).";
+      }
     }
     if (!formValues.evento || !Number.isInteger(Number(formValues.evento))) {
       nextErrors.evento = "Selecciona un evento valido.";
@@ -168,7 +176,7 @@ function ReservationFormPage() {
     if (!Number.isInteger(cupos) || cupos <= 0) {
       nextErrors.cupos_solicitados = "Indica una cantidad de cupos mayor a 0.";
     }
-    if (!ESTADO_OPTIONS.some((option) => option.value === formValues.estado)) {
+    if (canManage && !ESTADO_OPTIONS.some((option) => option.value === formValues.estado)) {
       nextErrors.estado = "Selecciona un estado valido.";
     }
     const notasMax = getFieldRule("notas", "max_length", 2000);
@@ -193,6 +201,11 @@ function ReservationFormPage() {
     setSubmitting(true);
     try {
       const payload = { ...formValues };
+      if (!canManage) {
+        payload.solicitante = undefined;
+        payload.espacio = undefined;
+        payload.estado = ESTADO_OPTIONS[0].value;
+      }
       if (payload.evento === "") {
         payload.evento = null;
       }
@@ -279,31 +292,33 @@ function ReservationFormPage() {
         </div>
       ) : (
         <form className="grid" style={{ gap: "14px" }} onSubmit={handleSubmit} noValidate>
-          <div className="form-field">
-            <label htmlFor="espacio">
-              Espacio <span aria-hidden="true">*</span>
-            </label>
-            <p className="card__meta">
-              {reservaSchema?.espacio?.help_text ?? "Nombre del espacio o sala."}
-            </p>
-            <input
-              id="espacio"
-              name="espacio"
-              type="text"
-              autoComplete="off"
-              value={formValues.espacio}
-              onChange={handleChange}
-              required
-              disabled={submitting}
-              minLength={getFieldRule("espacio", "min_length", 3)}
-              maxLength={getFieldRule("espacio", "max_length", 150)}
-            />
-            {formErrors.espacio && (
-              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.espacio}
-              </span>
-            )}
-          </div>
+          {canManage && (
+            <div className="form-field">
+              <label htmlFor="espacio">
+                Espacio <span aria-hidden="true">*</span>
+              </label>
+              <p className="card__meta">
+                {reservaSchema?.espacio?.help_text ?? "Nombre del espacio o sala."}
+              </p>
+              <input
+                id="espacio"
+                name="espacio"
+                type="text"
+                autoComplete="off"
+                value={formValues.espacio}
+                onChange={handleChange}
+                required
+                disabled={submitting}
+                minLength={getFieldRule("espacio", "min_length", 3)}
+                maxLength={getFieldRule("espacio", "max_length", 150)}
+              />
+              {formErrors.espacio && (
+                <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                  {formErrors.espacio}
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="form-field">
             <label htmlFor="evento">Evento asociado</label>
@@ -404,57 +419,61 @@ function ReservationFormPage() {
             )}
           </div>
 
-          <div className="form-field">
-            <label htmlFor="solicitante">
-              Solicitante <span aria-hidden="true">*</span>
-            </label>
-            <p className="card__meta">
-              {reservaSchema?.solicitante?.help_text ??
-                "Area o responsable de la reserva."}
-            </p>
-            <input
-              id="solicitante"
-              name="solicitante"
-              type="text"
-              autoComplete="organization"
-              value={formValues.solicitante}
-              onChange={handleChange}
-              required
-              disabled={submitting}
-              minLength={getFieldRule("solicitante", "min_length", 3)}
-              maxLength={getFieldRule("solicitante", "max_length", 150)}
-            />
-            {formErrors.solicitante && (
-              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.solicitante}
-              </span>
-            )}
-          </div>
+          {canManage && (
+            <div className="form-field">
+              <label htmlFor="solicitante">
+                Solicitante <span aria-hidden="true">*</span>
+              </label>
+              <p className="card__meta">
+                {reservaSchema?.solicitante?.help_text ??
+                  "Area o responsable de la reserva."}
+              </p>
+              <input
+                id="solicitante"
+                name="solicitante"
+                type="text"
+                autoComplete="organization"
+                value={formValues.solicitante}
+                onChange={handleChange}
+                required
+                disabled={submitting}
+                minLength={getFieldRule("solicitante", "min_length", 3)}
+                maxLength={getFieldRule("solicitante", "max_length", 150)}
+              />
+              {formErrors.solicitante && (
+                <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                  {formErrors.solicitante}
+                </span>
+              )}
+            </div>
+          )}
 
-          <div className="form-field">
-            <label htmlFor="estado">
-              Estado <span aria-hidden="true">*</span>
-            </label>
-            <select
-              id="estado"
-              name="estado"
-              value={formValues.estado}
-              onChange={handleChange}
-              required
-              disabled={submitting}
-            >
-              {ESTADO_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {formErrors.estado && (
-              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
-                {formErrors.estado}
-              </span>
-            )}
-          </div>
+          {canManage && (
+            <div className="form-field">
+              <label htmlFor="estado">
+                Estado <span aria-hidden="true">*</span>
+              </label>
+              <select
+                id="estado"
+                name="estado"
+                value={formValues.estado}
+                onChange={handleChange}
+                required
+                disabled={submitting}
+              >
+                {ESTADO_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {formErrors.estado && (
+                <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                  {formErrors.estado}
+                </span>
+              )}
+            </div>
+          )}
 
           <div className="form-field">
             <label htmlFor="notas">Notas</label>

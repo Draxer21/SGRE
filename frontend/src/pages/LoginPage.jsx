@@ -168,8 +168,8 @@ function LoginPage() {
             }}
           >
             <span>{t("auth.help")}</span>
-            <Link to="/" className="link">
-              {t("auth.back")}
+            <Link to="/inicio" className="link">
+              Volver al inicio
             </Link>
           </div>
         </div>

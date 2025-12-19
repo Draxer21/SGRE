@@ -8,7 +8,7 @@ import { listReservas } from "../services/reservationsService.js";
 
 function ReservationsPage() {
   useBackendStyles("reservas");
-  const { canEdit } = useAuth();
+  const { user, canEdit } = useAuth();
   const { data: reservasData, loading: loadingReservas, error: errorReservas } = useAsync(
     () => listReservas({ page_size: 5, ordering: "-creado" }),
     [],
@@ -21,7 +21,7 @@ function ReservationsPage() {
         subtitle={canEdit() ? "Controla espacios, cupos y solicitudes." : "Consulta reservas de espacios."}
         actions={
           <>
-            {canEdit() && (
+            {user && (
               <Link className="btn btn--primary" to="/reservas/nueva">
                 Nueva reserva
               </Link>

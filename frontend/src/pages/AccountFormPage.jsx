@@ -18,9 +18,12 @@ const ROL_OPTIONS = [
 
 const EMPTY_VALUES = {
   nombre: "",
+  usuario: "",
   email: "",
   rol: ROL_OPTIONS[0].value,
   activo: true,
+  password: "",
+  passwordConfirm: "",
 };
 
 function AccountFormPage() {
@@ -57,9 +60,12 @@ function AccountFormPage() {
         }
         setFormValues({
           nombre: data.nombre ?? "",
+          usuario: data.usuario ?? "",
           email: data.email ?? "",
           rol: data.rol ?? ROL_OPTIONS[0].value,
           activo: Boolean(data.activo),
+          password: "",
+          passwordConfirm: "",
         });
         setFeedback(null);
       })
@@ -106,13 +112,22 @@ function AccountFormPage() {
     if (!formValues.nombre.trim() || formValues.nombre.trim().length < nombreMin) {
       nextErrors.nombre = "El nombre debe tener al menos 3 caracteres.";
     }
-    if (!formValues.email.trim()) {
-      nextErrors.email = "El email es obligatorio.";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
+    if (!formValues.usuario.trim() || formValues.usuario.trim().length < 3) {
+      nextErrors.usuario = "El usuario debe tener al menos 3 caracteres.";
+    }
+    if (formValues.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email)) {
       nextErrors.email = "Ingresa un email valido.";
     }
     if (!ROL_OPTIONS.some((option) => option.value === formValues.rol)) {
       nextErrors.rol = "Selecciona un rol valido.";
+    }
+    if (!isEdit && !formValues.password) {
+      nextErrors.password = "Debes definir una contraseña inicial.";
+    } else if (formValues.password && formValues.password.length < 8) {
+      nextErrors.password = "La contraseña debe tener al menos 8 caracteres.";
+    }
+    if (formValues.password && formValues.password !== formValues.passwordConfirm) {
+      nextErrors.passwordConfirm = "Las contraseñas no coinciden.";
     }
     return nextErrors;
   };
@@ -132,11 +147,17 @@ function AccountFormPage() {
 
     setSubmitting(true);
     try {
+      const payload = { ...formValues };
+      if (!payload.password) {
+        delete payload.password;
+      }
+      delete payload.passwordConfirm;
+
       if (isEdit) {
-        await updateCuenta(id, formValues);
+        await updateCuenta(id, payload);
         setFeedback({ type: "success", message: "Cuenta actualizada." });
       } else {
-        await createCuenta(formValues);
+        await createCuenta(payload);
         setFeedback({ type: "success", message: "Cuenta creada correctamente." });
         setFormValues(EMPTY_VALUES);
       }
@@ -234,11 +255,35 @@ function AccountFormPage() {
           </div>
 
           <div className="form-field">
+            <label htmlFor="usuario">
+              Usuario <span aria-hidden="true">*</span>
+            </label>
+            <p className="card__meta">Nombre de usuario para iniciar sesion.</p>
+            <input
+              id="usuario"
+              name="usuario"
+              type="text"
+              autoComplete="username"
+              value={formValues.usuario}
+              onChange={handleChange}
+              required
+              disabled={submitting}
+              minLength={3}
+              maxLength={150}
+            />
+            {formErrors.usuario && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.usuario}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
             <label htmlFor="email">
-              Email <span aria-hidden="true">*</span>
+              Email
             </label>
             <p className="card__meta">
-              {cuentaSchema?.email?.help_text ?? "Correo institucional del usuario."}
+              {cuentaSchema?.email?.help_text ?? "Correo institucional del usuario (opcional)."}
             </p>
             <input
               id="email"
@@ -247,7 +292,6 @@ function AccountFormPage() {
               autoComplete="email"
               value={formValues.email}
               onChange={handleChange}
-              required
               disabled={submitting}
               maxLength={getFieldRule("email", "max_length", 254)}
             />
@@ -296,6 +340,55 @@ function AccountFormPage() {
               />
               <span className="card__meta">Desmarca para suspender el acceso.</span>
             </div>
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="password">
+              Contraseña {!isEdit && <span aria-hidden="true">*</span>}
+            </label>
+            <p className="card__meta" style={{ marginTop: 0 }}>
+              {isEdit
+                ? "Deja vacio si no deseas cambiar la contraseña."
+                : "Minimo 8 caracteres."}
+            </p>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete={isEdit ? "new-password" : "new-password"}
+              value={formValues.password}
+              onChange={handleChange}
+              required={!isEdit}
+              disabled={submitting}
+              minLength={8}
+            />
+            {formErrors.password && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.password}
+              </span>
+            )}
+          </div>
+
+          <div className="form-field">
+            <label htmlFor="passwordConfirm">
+              Confirmar contraseña {!isEdit && <span aria-hidden="true">*</span>}
+            </label>
+            <input
+              id="passwordConfirm"
+              name="passwordConfirm"
+              type="password"
+              autoComplete="new-password"
+              value={formValues.passwordConfirm}
+              onChange={handleChange}
+              required={!isEdit}
+              disabled={submitting}
+              minLength={8}
+            />
+            {formErrors.passwordConfirm && (
+              <span style={{ color: "#b91c1c", fontSize: "0.85rem" }}>
+                {formErrors.passwordConfirm}
+              </span>
+            )}
           </div>
 
           <div

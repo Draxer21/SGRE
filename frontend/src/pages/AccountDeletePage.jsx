@@ -84,7 +84,8 @@ function AccountDeletePage() {
           <p className="card__meta">
             ¿Confirma eliminar la cuenta <strong>{cuenta.nombre}</strong>?
           </p>
-          <p className="card__meta">{cuenta.email}</p>
+          <p className="card__meta">Usuario: {cuenta.usuario}</p>
+          {cuenta.email && <p className="card__meta">{cuenta.email}</p>}
           <div
             className="grid"
             style={{

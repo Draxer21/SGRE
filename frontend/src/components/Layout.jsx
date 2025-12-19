@@ -21,6 +21,7 @@ const FALLBACK_MANIFEST = {
   navigation: [
     { to: "/cuentas", label: "Cuentas" },
     { to: "/dashboard", label: "Panel" },
+    { to: "/perfil", label: "Perfil" },
     { to: "/eventos", label: "Eventos" },
     { to: "/reservas", label: "Reservas" },
     { to: "/reportes", label: "Reportes" },
@@ -70,10 +71,23 @@ function toTitle(value) {
 
 function Layout() {
   const { data: manifestData } = useAsync(getFrontendManifest, []);
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, role, loading: authLoading, logout } = useAuth();
   const { t } = useI18n();
 
   const navigationItems = manifestData?.navigation ?? FALLBACK_MANIFEST.navigation;
+  const restrictedPrefixes = [
+    "/dashboard",
+    "/cuentas",
+    "/reportes",
+    "/notificaciones",
+  ];
+  const visibleNavigationItems =
+    role === "consulta"
+      ? navigationItems.filter(
+          (item) =>
+            !restrictedPrefixes.some((prefix) => item.to.startsWith(prefix)),
+        )
+      : navigationItems;
   const brand = {
     title: manifestData?.brand?.title ?? t("brand.title"),
     subtitle: manifestData?.brand?.subtitle ?? t("brand.subtitle"),
@@ -114,7 +128,7 @@ function Layout() {
           <span className="brand__subtitle">{brand.subtitle}</span>
         </div>
         <nav className="app-shell__nav">
-          {navigationItems.map((item) => (
+          {visibleNavigationItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

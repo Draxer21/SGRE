@@ -24,6 +24,19 @@ function Table({
 }) {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
+  const handleRowClick = (event, row) => {
+    if (!onRowClick) {
+      return;
+    }
+    const interactive = event.target.closest(
+      "a,button,input,select,textarea,label"
+    );
+    if (interactive) {
+      return;
+    }
+    onRowClick(row);
+  };
+
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -105,7 +118,7 @@ function Table({
           {sortedData.map((row) => (
             <tr
               key={row[keyField]}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
+              onClick={onRowClick ? (event) => handleRowClick(event, row) : undefined}
               style={{ cursor: onRowClick ? "pointer" : "default" }}
             >
               {columns.map((column) => (

@@ -25,9 +25,6 @@ function NotificationsPage() {
         subtitle={t("notifications.subtitle", "Comunica, programa y monitorea mensajes a usuarios.")}
         actions={
           <>
-            <Link className="btn btn--primary" to="/notificaciones/nueva">
-              Nueva notificación
-            </Link>
             <Link className="btn btn--ghost" to="/notificaciones/historial">
               Historial completo
             </Link>
@@ -35,7 +32,6 @@ function NotificationsPage() {
         }
       />
 
-      />
 
       {/* Filter section */}
       <section className="surface" style={{ padding: "16px" }}>

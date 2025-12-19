@@ -1,10 +1,12 @@
 from datetime import date
 
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, get_user_model, login, logout
 from rest_framework.permissions import AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from cuentas.api import CuentaSerializer
+from cuentas.models import Cuenta
 from cuentas.permissions import get_user_role
 from eventos.models import Evento
 from reservas.models import Reserva
@@ -116,6 +118,57 @@ class SessionLoginAPIView(APIView):
                 "username": user.get_username(),
                 "role": role,
             }
+        )
+
+
+class SessionRegisterAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        nombre = (request.data.get("nombre") or "").strip()
+        usuario = (request.data.get("usuario") or "").strip()
+        email = (request.data.get("email") or "").strip().lower()
+        password = request.data.get("password") or ""
+
+        if not nombre or not usuario or not password:
+            return Response(
+                {"detail": "Debes completar nombre, usuario y contraseña."},
+                status=400,
+            )
+
+        serializer = CuentaSerializer(
+            data={
+                "nombre": nombre,
+                "usuario": usuario,
+                "email": email or None,
+                "rol": Cuenta.CONSULTA,
+                "activo": True,
+                "password": password,
+            },
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        user_model = get_user_model()
+        username_field = user_model.USERNAME_FIELD
+        user = user_model.objects.filter(**{username_field: usuario}).first()
+        if not user:
+            return Response({"detail": "No fue posible iniciar sesión."}, status=500)
+
+        user.backend = "django.contrib.auth.backends.ModelBackend"
+        login(request, user)
+        request.session["usuario_actual"] = user.get_username()
+
+        role = get_user_role(user)
+
+        return Response(
+            {
+                "detail": "Registro completado.",
+                "username": user.get_username(),
+                "role": role,
+            },
+            status=201,
         )
 
 

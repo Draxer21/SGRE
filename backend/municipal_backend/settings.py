@@ -32,7 +32,8 @@ SECRET_KEY = os.getenv("SECRET_KEY", "dev-insecure-change-me")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool("DEBUG", False)
 
-ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h] or []
+# ALLOWED_HOSTS must not be empty when DEBUG=False; default to localhost for dev.
+ALLOWED_HOSTS = [h for h in os.getenv("ALLOWED_HOSTS", "").split(",") if h] or ["localhost", "127.0.0.1"]
 
 
 # Application definition

@@ -14,3 +14,8 @@ export async function loginSession(payload) {
   const response = await apiClient.post("session/login/", payload);
   return response.data;
 }
+
+export async function registerSession(payload) {
+  const response = await apiClient.post("session/register/", payload);
+  return response.data;
+}
